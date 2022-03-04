@@ -2,10 +2,9 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use App\ErrorLog;
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-
 
 class Handler extends ExceptionHandler
 {
@@ -24,6 +23,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontFlash = [
+        'current_password',
         'password',
         'password_confirmation',
     ];
@@ -46,16 +46,13 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response
      */
-
     private function customErrorLogging($request, $exception)
     {
-
-        try
-        {
+        try {
             $errorLog = new ErrorLog;
 
             $errorLog->ip = strval($request->ip());
-            $errorLog->application = "API";
+            $errorLog->application = 'API';
             $errorLog->url = strval($request->fullUrl());
             $errorLog->method = strval($request->method());
             $errorLog->parameters = strval(json_encode($request->all()));
@@ -66,33 +63,27 @@ class Handler extends ExceptionHandler
             $errorLog->line = strval($exception->getLine());
 
             $errorLog->save();
-
-        } catch(\Exception $exception)  {
-            
-
+        } catch (\Exception $exception) {
             $errorLog = new ErrorLog;
 
-            $errorLog->ip = "Server Error";
-            $errorLog->application = "API";
+            $errorLog->ip = 'Server Error';
+            $errorLog->application = 'API';
             $errorLog->message = strval($exception->getMessage());
             $errorLog->file = strval($exception->getFile());
             $errorLog->line = strval($exception->getLine());
 
             $errorLog->save();
-
         }
-
     }
 
     public function render($request, Exception $exception)
     {
-    
         $this->customErrorLogging($request, $exception);
-    
+
         $returnData = new \stdClass();
         $returnData->data = [];
         $returnData->errors = $exception->getMessage();
-        return response(json_encode($returnData));
 
+        return response(json_encode($returnData));
     }
 }

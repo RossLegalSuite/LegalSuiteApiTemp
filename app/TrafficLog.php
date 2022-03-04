@@ -8,15 +8,17 @@ use Illuminate\Notifications\Notifiable;
 class TrafficLog extends Authenticatable
 {
     use Notifiable;
+
     protected $table = 'trafficlog';
+
     protected $fillable = [
-        "ip",
-        "url",
-        "method",
-        "executionTime",
-        "httpStatusCode",
-        "clientId",
-        "developerId",
+        'ip',
+        'url',
+        'method',
+        'executionTime',
+        'httpStatusCode',
+        'clientId',
+        'developerId',
 
     ];
 }

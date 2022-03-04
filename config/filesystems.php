@@ -13,18 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DRIVER', 'local'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Default Cloud Filesystem Disk
-    |--------------------------------------------------------------------------
-    |
-    | Many applications store files both locally and in the cloud. For this
-    | reason, you may specify a default "cloud" driver here. This driver
-    | will be bound as the Cloud disk implementation in the container.
-    |
-    */
+    'default' => env('FILESYSTEM_DISK', 'local'),
 
     'cloud' => env('FILESYSTEM_CLOUD', 's3'),
 
@@ -47,19 +36,20 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+
         'logs' => [
             'driver' => 'local',
             'root' => storage_path('logs'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'private',
         ],
-        
 
         's3' => [
             'driver' => 's3',
@@ -68,6 +58,8 @@ return [
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
 
         'af-south-1' => [
@@ -79,8 +71,21 @@ return [
             'url' => env('AF_SOUTH_1_URL'),
         ],
 
+    ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Symbolic Links
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the symbolic links that will be created when the
+    | `storage:link` Artisan command is executed. The array keys should be
+    | the locations of the links and the values should be their targets.
+    |
+    */
 
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
     ],
 
 ];

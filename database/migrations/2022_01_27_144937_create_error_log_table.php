@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateErrorLogTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -27,7 +26,6 @@ class CreateErrorLogTable extends Migration
             $table->string('line', 20)->nullable();
 
             $table->timestamps();
-
         });
     }
 
@@ -40,4 +38,4 @@ class CreateErrorLogTable extends Migration
     {
         Schema::dropIfExists('errorlog');
     }
-}
+};

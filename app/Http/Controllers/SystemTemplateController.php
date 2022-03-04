@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Custom\ControllerHelper;
 use App\LegalSuiteOnline\Models\LolSystemTemplate;
 use Illuminate\Http\Request;
+
 //use Illuminate\Support\Facades\DB;
 
 class SystemTemplateController extends Controller
 {
-
-    
     /*public function get(Request $request) {
 
         try {
@@ -52,7 +50,7 @@ class SystemTemplateController extends Controller
 
             //     }
 
-            // }            
+            // }
 
             // $returnData->data = $query->get();
 
@@ -68,15 +66,14 @@ class SystemTemplateController extends Controller
     public function store(Request $request)
     {
         try {
-
             $requestData = $request->all();
 
             $this->validateData($requestData);
 
             return json_encode(LolSystemTemplate::create($requestData));
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
@@ -84,21 +81,20 @@ class SystemTemplateController extends Controller
     public function update(Request $request)
     {
         try {
-
-			$requestData = $request->all();
+            $requestData = $request->all();
 
             $this->validateData($requestData);
 
             $recordData = LolSystemTemplate::findOrFail($requestData['recordid']);
 
             unset($requestData['recordid']);
-            
+
             $recordData->update($requestData);
 
             return json_encode($recordData);
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
@@ -106,15 +102,14 @@ class SystemTemplateController extends Controller
     public function delete(Request $request)
     {
         try {
+            $requestData = $request->all();
 
-			$requestData = $request->all();
+            $recordData = LolSystemTemplate::findOrFail($requestData['recordid'])->delete();
 
-    		$recordData = LolSystemTemplate::findOrFail($requestData['recordid'])->delete();
-
-			return ControllerHelper::PostPutDeleteFormatHelper($recordData, $request);
-
-        } catch(\Exception $e)  {
+            return ControllerHelper::PostPutDeleteFormatHelper($recordData, $request);
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
@@ -122,13 +117,12 @@ class SystemTemplateController extends Controller
     public function getTablePosition(Request $request)
     {
         try {
-
             $returnData = new \stdClass();
 
-    		$returnData->data = LolSystemTemplate::whereRaw('title < \'' . $request['title'] . '\'')->count();
+            $returnData->data = LolSystemTemplate::whereRaw('title < \''.$request['title'].'\'')->count();
 
             return json_encode($returnData);
-            
+
             /* Testing
                 use App\LegalSuiteOnline\Models\LolSystemTemplate;
                 $returnData = new \stdClass();
@@ -136,30 +130,25 @@ class SystemTemplateController extends Controller
                 $returnData->data = LolSystemTemplate::whereRaw('title < \'' . $request['title'] . '\'')->count();
 
             */
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
 
-
-    private function validateData($record) {
-
-        if ( !isset($record['title']) ) {
-            throw new \Exception("Please provide a title");
-        }
-        
-        if ( !isset($record['description']) ) {
-            throw new \Exception("Please provide a description");
-        }
-        
-        if ( !isset($record['source']) ) {
-            throw new \Exception("The source is required.");
+    private function validateData($record)
+    {
+        if (! isset($record['title'])) {
+            throw new \Exception('Please provide a title');
         }
 
+        if (! isset($record['description'])) {
+            throw new \Exception('Please provide a description');
+        }
+
+        if (! isset($record['source'])) {
+            throw new \Exception('The source is required.');
+        }
     }
-
-
-
 }

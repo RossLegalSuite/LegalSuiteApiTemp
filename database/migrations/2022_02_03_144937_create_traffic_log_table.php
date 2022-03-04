@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTrafficLogTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -26,7 +25,6 @@ class CreateTrafficLogTable extends Migration
             $table->Text('parameters')->nullable();
 
             $table->timestamps();
-
         });
     }
 
@@ -39,4 +37,4 @@ class CreateTrafficLogTable extends Migration
     {
         Schema::dropIfExists('trafficlog');
     }
-}
+};

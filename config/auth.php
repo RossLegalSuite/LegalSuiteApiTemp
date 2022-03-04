@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -12,13 +12,12 @@ return [
     | as required, but they're a perfect start for most applications.
     |
     */
-    
+
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'clients',
-        // 'passwords' => 'users',
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -32,29 +31,29 @@ return [
     | users are actually retrieved out of your database or other storage
     | mechanisms used by this application to persist your user's data.
     |
-    | Supported: "session", "token"
+    | Supported: "session"
     |
     */
-    
+
     'guards' => [
         'web' => [
             'driver' => 'session',
             'provider' => 'clients',
-            // 'provider' => 'users',
         ],
+
         'developer' => [
             'driver' => 'session',
             'provider' => 'developers',
             // 'provider' => 'users',
         ],
-        
+
         'api' => [
             'driver' => 'token',
             'provider' => 'api_access',
             'hash' => false,
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -71,64 +70,76 @@ return [
     | Supported: "database", "eloquent"
     |
     */
-    
+
     'providers' => [
         'clients' => [
             'driver' => 'eloquent',
             'model' => App\Client::class,
         ],
+
         'developers' => [
             'driver' => 'eloquent',
             'model' => App\Developer::class,
         ],
-        
+
         'api_access' => [
             'driver' => 'eloquent',
             'model' => App\ApiAccess::class,
         ],
-        
+
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
+
         // 'users' => [
-            //     'driver' => 'database',
-            //     'table' => 'users',
-            // ],
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resetting Passwords
+    |--------------------------------------------------------------------------
+    |
+    | You may specify multiple password reset configurations if you have more
+    | than one user table or model in the application and you want to have
+    | separate password reset settings based on the specific user types.
+    |
+    | The expire time is the number of minutes that each reset token will be
+    | considered valid. This security feature keeps tokens short-lived so
+    | they have less time to be guessed. You may change this as needed.
+    |
+    */
+
+    'passwords' => [
+        'clients' => [
+            'provider' => 'tr',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
         ],
-        
-        /*
-        |--------------------------------------------------------------------------
-        | Resetting Passwords
-        |--------------------------------------------------------------------------
-        |
-        | You may specify multiple password reset configurations if you have more
-        | than one user table or model in the application and you want to have
-        | separate password reset settings based on the specific user types.
-        |
-        | The expire time is the number of minutes that the reset token should be
-        | considered valid. This security feature keeps tokens short-lived so
-        | they have less time to be guessed. You may change this as needed.
-        |
-        */
-        
-        'passwords' => [
-            'clients' => [
-                'provider' => 'tr',
-                'table' => 'password_resets',
-                'expire' => 60,
-                'throttle' => 60,
-            ],
+
+        'users' => [
+            'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
         ],
-        
-        /*
-        |--------------------------------------------------------------------------
-        | Password Confirmation Timeout
-        |--------------------------------------------------------------------------
-        |
-        | Here you may define the amount of seconds before a password confirmation
-        | times out and the user is prompted to re-enter their password via the
-        | confirmation screen. By default, the timeout lasts for three hours.
-        |
-        */
-        
-        'password_timeout' => 10800,
-        
-    ];
-    
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Confirmation Timeout
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the amount of seconds before a password confirmation
+    | times out and the user is prompted to re-enter their password via the
+    | confirmation screen. By default, the timeout lasts for three hours.
+    |
+    */
+
+    'password_timeout' => 10800,
+
+];

@@ -2,75 +2,83 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Custom\ModelHelper;
+use App\Custom\SelectAndJoinBuilder;
 use App\Custom\Utils;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use App\GenericTableModels\loltagged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\GenericTableModels\loltagged;
-use App\Custom\SelectAndJoinBuilder;
-use App\Custom\ModelHelper;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UtilsController extends Controller
 {
+    public function checkSecurity(Request $request)
+    {
+        /* Test in Tinker
+        $controller = new \App\Http\Controllers\UtilsController;
+        $request = new \Illuminate\Http\Request;
+        $request['employeeid'] = "5";
+        $request['employeeid'] = "6";
+        $request['matterid'] = "71017";
+        $request['description'] = "Browse - Address Book - Change";
+        $request['description'] = "Matters - Update - Insert";
+        $request['description'] = "Matters - Update - Delete";
+        $request['description'] = "Matters - Update - Change";
+        $controller->checkSecurity($request);
 
-    public function checkSecurity(Request $request) {
-/* Test in Tinker
-$controller = new \App\Http\Controllers\UtilsController;
-$request = new \Illuminate\Http\Request;
-$request['employeeid'] = "5";
-$request['employeeid'] = "6";
-$request['matterid'] = "71017";
-$request['description'] = "Browse - Address Book - Change";
-$request['description'] = "Matters - Update - Insert";
-$request['description'] = "Matters - Update - Delete";
-$request['description'] = "Matters - Update - Change";
-$controller->checkSecurity($request);
-
-*/  
+        */
         $returnData = new \stdClass();
 
         $returnData->data = '';
         $returnData->errors = '';
 
-        if ( !isset($request->employeeid) ) throw new \Exception('EmployeeId not specified');
-        if ( !isset($request->description) ) throw new \Exception('SecProc description not specified');
-
-        $control = \App\GenericTableModels\control::select(['licencevaliduntil'])->first();
-        if ( !$control ) throw new \Exception("An error was encountered getting the Licence Valid Until date from the Control table.");
-
-        if ( (int) $control->licencevaliduntil >= 90000 ) {
-            throw new \Exception("Licence Valid Until Setting: You are not licenced to access this area of the program.");
+        if (! isset($request->employeeid)) {
+            throw new \Exception('EmployeeId not specified');
+        }
+        if (! isset($request->description)) {
+            throw new \Exception('SecProc description not specified');
         }
 
-        $employee = \App\GenericTableModels\employee::select(['supervisorflag','secgroupid'])->where('RecordID',$request->employeeid)->first();
-        if ( !$employee ) throw new \Exception("An error was encountered getting the Employee.");
+        $control = \App\GenericTableModels\control::select(['licencevaliduntil'])->first();
+        if (! $control) {
+            throw new \Exception('An error was encountered getting the Licence Valid Until date from the Control table.');
+        }
+
+        if ((int) $control->licencevaliduntil >= 90000) {
+            throw new \Exception('Licence Valid Until Setting: You are not licenced to access this area of the program.');
+        }
+
+        $employee = \App\GenericTableModels\employee::select(['supervisorflag', 'secgroupid'])->where('RecordID', $request->employeeid)->first();
+        if (! $employee) {
+            throw new \Exception('An error was encountered getting the Employee.');
+        }
 
         // Allow the Supervisor
-        if ( $employee->supervisorflag == '1' ) {
+        if ($employee->supervisorflag == '1') {
             $returnData->data = 'Employee is a Supervisor - Access is allowed';
+
             return json_encode($returnData);
         }
 
         if ($request->description == 'Matters - Update - Change' && isset($request->matterid)) {
-
-            $matter = \App\GenericTableModels\matter::select(['access', 'employeeid'])->where('RecordID',$request->matterid)->first();
-            if ( !$matter ) throw new \Exception("An error was encountered getting the Matter.");
+            $matter = \App\GenericTableModels\matter::select(['access', 'employeeid'])->where('RecordID', $request->matterid)->first();
+            if (! $matter) {
+                throw new \Exception('An error was encountered getting the Matter.');
+            }
 
             if ($matter->access == 'R') {
                 if ($matter->employeeid != $request->employeeid) {
-                    throw new \Exception("This is a Restricted Matter. It can only be viewed by the Owner of the Matter");
+                    throw new \Exception('This is a Restricted Matter. It can only be viewed by the Owner of the Matter');
                 }
             }
-
         }
 
-        $secproc = \App\GenericTableModels\secproc::select('accessflag')->where('SecGroupID',$employee->secgroupid)->where('description',$request->description)->first();
+        $secproc = \App\GenericTableModels\secproc::select('accessflag')->where('SecGroupID', $employee->secgroupid)->where('description', $request->description)->first();
 
-        if ( $secproc ) {
-            if ( $secproc->accessflag != '1' ) {
-                throw new \Exception("Your Security Settings do not allow you to access this area of the program.");
+        if ($secproc) {
+            if ($secproc->accessflag != '1') {
+                throw new \Exception('Your Security Settings do not allow you to access this area of the program.');
             } else {
                 $returnData->data = 'User has access to this area of the program';
             }
@@ -79,55 +87,71 @@ $controller->checkSecurity($request);
         }
 
         return json_encode($returnData);
-
     }
 
-    public function uploadDocumentToDoclog(Request $request) {
+    public function uploadDocumentToDoclog(Request $request)
+    {
 
         // For use by 3rd party apps
 
-        if ( !isset($request->employeelogin) ) throw new \Exception("Please specify the Employee's login id.");
+        if (! isset($request->employeelogin)) {
+            throw new \Exception("Please specify the Employee's login id.");
+        }
 
-        if ( !isset($request->matterfileref) ) throw new \Exception("Please specify the File Ref of the Matter.");
+        if (! isset($request->matterfileref)) {
+            throw new \Exception('Please specify the File Ref of the Matter.');
+        }
 
-        if ( !isset($request->description) ) throw new \Exception("Please specify a description of the object to be uploaded.");
+        if (! isset($request->description)) {
+            throw new \Exception('Please specify a description of the object to be uploaded.');
+        }
 
-        if ( !isset($request->filename) ) throw new \Exception("Please specify the File Name of the object.");
+        if (! isset($request->filename)) {
+            throw new \Exception('Please specify the File Name of the object.');
+        }
 
-        if ( !isset($request->filecontents) ) throw new \Exception("Please specify the File Contents to be uploaded.");
+        if (! isset($request->filecontents)) {
+            throw new \Exception('Please specify the File Contents to be uploaded.');
+        }
 
+        $matter = \App\GenericTableModels\matter::select(['recordid'])->where('FileRef', $request->matterfileref)->first();
+        if (! $matter) {
+            throw new \Exception('An error was encountered getting the Matter.');
+        }
 
-        $matter = \App\GenericTableModels\matter::select(['recordid'])->where('FileRef',$request->matterfileref)->first();
-        if ( !$matter ) throw new \Exception("An error was encountered getting the Matter.");
-
-        $employee = \App\GenericTableModels\employee::select(['recordid'])->where('LoginId',$request->employeelogin)->first();
-        if ( !$employee ) throw new \Exception("An error was encountered getting the Employee.");
+        $employee = \App\GenericTableModels\employee::select(['recordid'])->where('LoginId', $request->employeelogin)->first();
+        if (! $employee) {
+            throw new \Exception('An error was encountered getting the Employee.');
+        }
 
         $control = \App\GenericTableModels\control::select(['firmcode'])->first();
-        if ( !$control ) throw new \Exception("An error was encountered getting the Firm Code from the Control table.");
+        if (! $control) {
+            throw new \Exception('An error was encountered getting the Firm Code from the Control table.');
+        }
 
         $doclogcategory = \App\GenericTableModels\doclogcategory::select(['recordid'])->whereRaw("description LIKE '%document%'")->orderBy('RecordID')->first();
-        if ( !$doclogcategory ) throw new \Exception("An error was encountered getting the categoryid from the DoclogCategory table.");
+        if (! $doclogcategory) {
+            throw new \Exception('An error was encountered getting the categoryid from the DoclogCategory table.');
+        }
 
         try {
-
             $returnData = new \stdClass();
 
             $cloudStorage = Storage::disk('af-south-1');
-    
+
             $returnData->fileName = $request->filename;
 
-            $path = strtolower( $control->firmcode . '/' . $employee->recordid . '/' . $matter->recordid .'/uploads' );
-    
-            $returnData->url = $cloudStorage->url($path . '/' . $returnData->fileName );
+            $path = strtolower($control->firmcode.'/'.$employee->recordid.'/'.$matter->recordid.'/uploads');
 
-            $cloudStorage->put($path . '/' . $returnData->fileName, $request->filecontents,  'public');
+            $returnData->url = $cloudStorage->url($path.'/'.$returnData->fileName);
+
+            $cloudStorage->put($path.'/'.$returnData->fileName, $request->filecontents, 'public');
 
             date_default_timezone_set('Africa/Johannesburg');
 
             $doclog = new \stdClass();
-            $doclog->date = ModelHelper::convertClarionDate( date("Y-m-d") );
-            $doclog->time = ModelHelper::convertClarionTime( date("H:i:s") );
+            $doclog->date = ModelHelper::convertClarionDate(date('Y-m-d'));
+            $doclog->time = ModelHelper::convertClarionTime(date('H:i:s'));
             $doclog->description = $request->description;
             $doclog->matterid = $matter->recordid;
             $doclog->employeeid = $employee->recordid;
@@ -136,23 +160,19 @@ $controller->checkSecurity($request);
             $doclog->direction = 2; // Incoming
             $doclog->doclogcategoryid = $doclogcategory->recordid;
 
-            \App\GenericTableModels\doclog::create( (array) $doclog);
+            \App\GenericTableModels\doclog::create((array) $doclog);
 
             return json_encode($returnData);
-    
         } catch (\Exception $e) {
-
             $returnData->errors = $e->getMessage();
             //$returnData->errors = 'Server Error on line '.$e->getLine().' in '.$e->getFile() .': <br/>'.$e->getMessage();
 
-            return json_encode($returnData);            
-
-        }        
-
+            return json_encode($returnData);
+        }
     }
 
-
-    public function createDocumentUploadStoredProcedure() {
+    public function createDocumentUploadStoredProcedure()
+    {
 
         // ROSS: ********************************************************
         // This must be called when the user registers for the first time
@@ -168,17 +188,17 @@ $controller->checkSecurity($request);
 
         // Create the sp_UploadDocument Stored Procedure
 
-        DB::connection('sqlsrv')->statement("DROP PROCEDURE IF EXISTS dbo.sp_UploadDocument");
+        DB::connection('sqlsrv')->statement('DROP PROCEDURE IF EXISTS dbo.sp_UploadDocument');
 
-        $storedProceduresPath = base_path() . '/resources/stored_procedures/';
+        $storedProceduresPath = base_path().'/resources/stored_procedures/';
 
-        $procedure = file_get_contents($storedProceduresPath . 'sp_uploadDocument.sql');
+        $procedure = file_get_contents($storedProceduresPath.'sp_uploadDocument.sql');
 
         DB::connection('sqlsrv')->unprepared($procedure);
-
     }
 
-    public function uploadDocument(Request $request, $recordId) {
+    public function uploadDocument(Request $request, $recordId)
+    {
 
         /* Testing in Tinker
         Has saved name
@@ -199,71 +219,55 @@ $controller->checkSecurity($request);
 
         //https://stackoverflow.com/questions/52070741/laravel-model-sql-server-get-output-parameters-from-stored-procedure
 
-        $response = DB::connection('sqlsrv')->select("EXEC sp_UploadDocument ?", array( $recordId ) );
+        $response = DB::connection('sqlsrv')->select('EXEC sp_UploadDocument ?', [$recordId]);
 
         $result = $response[0];
 
         if (isset($result->error)) {
-
-            $returnData["errors"] = $result->error;
-            
+            $returnData['errors'] = $result->error;
         } else {
-            
             if (isset($result->data)) {
-                
-                $returnData["data"]["url"] = $result->data;
-
+                $returnData['data']['url'] = $result->data;
             } else {
-
-                $returnData["data"]["url"] = null;
-
+                $returnData['data']['url'] = null;
             }
         }
 
         return json_encode($returnData);
-
     }
 
-    public function getFileType(Request $request) {
-
-        if ( isset($request['filename']) ) {
-
-            $returnData["data"]["type"] = Utils::getFileType($request['filename']);
-            $returnData["data"]["mimetype"] = Utils::getMimeType($request['filename']);
-            
+    public function getFileType(Request $request)
+    {
+        if (isset($request['filename'])) {
+            $returnData['data']['type'] = Utils::getFileType($request['filename']);
+            $returnData['data']['mimetype'] = Utils::getMimeType($request['filename']);
         } else {
-            
-            $returnData["errors"] = 'No filename provided';
+            $returnData['errors'] = 'No filename provided';
         }
-        
+
         return json_encode($returnData);
-    
     }
 
-    public function getMimeType(Request $request) {
-
-        if ( isset($request['filename']) ) {
-
-            $returnData["data"] = Utils::getMimeType($request['filename']);
-            
+    public function getMimeType(Request $request)
+    {
+        if (isset($request['filename'])) {
+            $returnData['data'] = Utils::getMimeType($request['filename']);
         } else {
-            
-            $returnData["errors"] = 'No filename provided';
+            $returnData['errors'] = 'No filename provided';
         }
-        
-        return json_encode($returnData);
-    
-    }
-
-    public function getTagged(Request $request) {
-
-        $returnData["data"] = loltagged::where('tableName',$request['tablename'])->where('employeeid',$request['employeeid'])->pluck('taggedId')->toArray();
 
         return json_encode($returnData);
-
     }
 
-    public function addTagged(Request $request) {
+    public function getTagged(Request $request)
+    {
+        $returnData['data'] = loltagged::where('tableName', $request['tablename'])->where('employeeid', $request['employeeid'])->pluck('taggedId')->toArray();
+
+        return json_encode($returnData);
+    }
+
+    public function addTagged(Request $request)
+    {
 
         /* Laravel does not support storing records for tables with composite keys (like LolTagged)
         See: https://stackoverflow.com/questions/31415213/how-i-can-put-composite-keys-in-models-in-laravel-5
@@ -285,186 +289,163 @@ $controller->checkSecurity($request);
 
         */
 
-        $result = DB::connection('sqlsrv')->insert('INSERT INTO lolTagged ("tableName","employeeId","taggedId") values (?,?,?)',[$request['tablename'],$request['employeeid'],$request['taggedid']]);
+        $result = DB::connection('sqlsrv')->insert('INSERT INTO lolTagged ("tableName","employeeId","taggedId") values (?,?,?)', [$request['tablename'], $request['employeeid'], $request['taggedid']]);
 
-        if (!$result ) {
-            $returnData["errors"] = 'An error occured tagging the record';
+        if (! $result) {
+            $returnData['errors'] = 'An error occured tagging the record';
         } else {
-            $returnData["data"] = $request->all();
+            $returnData['data'] = $request->all();
         }
-        return json_encode($returnData);
 
+        return json_encode($returnData);
     }
 
-    public function deleteTagged(Request $request) {
-
+    public function deleteTagged(Request $request)
+    {
         $result = DB::connection('sqlsrv')->statement("DELETE lolTagged WHERE tableName = '{$request['tablename']}' AND employeeId = {$request['employeeid']} AND taggedId = {$request['taggedid']}");
 
-        if (!$result ) {
-            $returnData["errors"] = 'An error occured deleting the tagged record';
+        if (! $result) {
+            $returnData['errors'] = 'An error occured deleting the tagged record';
         } else {
-            $returnData["data"] = $request->all();
+            $returnData['data'] = $request->all();
         }
-        return json_encode($returnData);
 
+        return json_encode($returnData);
     }
 
-    public function deleteEmployeeTags(Request $request) {
-
+    public function deleteEmployeeTags(Request $request)
+    {
         $result = DB::connection('sqlsrv')->statement("DELETE lolTagged WHERE employeeId = {$request['employeeid']}");
 
-        if (!$result ) {
-            $returnData["errors"] = 'An error occured deleting the Employee tags';
+        if (! $result) {
+            $returnData['errors'] = 'An error occured deleting the Employee tags';
         } else {
-            $returnData["data"] = $request->all();
+            $returnData['data'] = $request->all();
         }
-        return json_encode($returnData);
 
+        return json_encode($returnData);
     }
 
-    public function clearTagged(Request $request) {
-
+    public function clearTagged(Request $request)
+    {
         $result = DB::connection('sqlsrv')->statement("DELETE lolTagged WHERE tableName = '{$request['tablename']}' AND employeeId = {$request['employeeid']}");
 
-        if (!$result ) {
-            $returnData["errors"] = 'An error occured tagging the record';
+        if (! $result) {
+            $returnData['errors'] = 'An error occured tagging the record';
         } else {
-            $returnData["data"] = $request->all();
+            $returnData['data'] = $request->all();
         }
-        return json_encode($returnData);
 
+        return json_encode($returnData);
     }
 
-    public function tagAll(Request $request) {
-
-        $statement = "INSERT INTO lolTagged (tableName, employeeId, taggedId) ";
+    public function tagAll(Request $request)
+    {
+        $statement = 'INSERT INTO lolTagged (tableName, employeeId, taggedId) ';
         $statement .= "SELECT '{$request['tablename']}', '{$request['employeeid']}', {$request['tablename']}.RecordID FROM {$request['tablename']} ";
 
-        if (method_exists('App\Custom\SelectAndJoinBuilder', strtolower($request['tablename']) . 'JoinBuilder') & !$request->removejoinbuilder) {
+        if (method_exists(\App\Custom\SelectAndJoinBuilder::class, strtolower($request['tablename']).'JoinBuilder') & ! $request->removejoinbuilder) {
 
             // Use this hack to get the table joins in string format to add to the statement
             $query = DB::connection('sqlsrv')->table('dummy');
 
-            SelectAndJoinBuilder::{strtolower($request['tablename']) . 'JoinBuilder'}($query);
+            SelectAndJoinBuilder::{strtolower($request['tablename']).'JoinBuilder'}($query);
 
             $dummySql = $query->toSql(); // Return select * from [dummy] left join ....
 
-            $joinExpression = substr($dummySql, strpos($dummySql, "]") + 1);
+            $joinExpression = substr($dummySql, strpos($dummySql, ']') + 1);
 
             $statement .= $joinExpression;
-
         }
 
-        $statement .= isset($request['whereraw']) ? ' WHERE ' . $request['whereraw'] : '';
+        $statement .= isset($request['whereraw']) ? ' WHERE '.$request['whereraw'] : '';
 
         $result = DB::connection('sqlsrv')->statement($statement);
 
-        if (!$result ) {
-
-            $returnData["errors"] = 'An error occured tagging all the records';
-
+        if (! $result) {
+            $returnData['errors'] = 'An error occured tagging all the records';
         } else {
-
-
-            $returnData["data"] = loltagged::where('tableName',$request['tablename'])->where('employeeid',$request['employeeid'])->pluck('taggedId')->toArray();
-
+            $returnData['data'] = loltagged::where('tableName', $request['tablename'])->where('employeeid', $request['employeeid'])->pluck('taggedId')->toArray();
         }
 
         return json_encode($returnData);
-
     }
 
-    public function getDebtorsAccount(Request $request) {
-
+    public function getDebtorsAccount(Request $request)
+    {
         $controller = new \App\Http\Controllers\DebtorsAccountController;
 
         return $controller->getDebtorsAccount($request);
-
     }
 
-
-    public function getIncomeAccount(Request $request) {
-
+    public function getIncomeAccount(Request $request)
+    {
         $returnData = new \stdClass();
         $returnData->data = [];
         $returnData->data['recordid'] = null;
         $returnData->data['overrideincomeaccflag'] = 0;
 
-        if ( !isset($request->matterid) ) {
+        if (! isset($request->matterid)) {
             throw new \Exception('getIncomeAccount - MatterId not specified');
         }
 
-        if ( !isset($request->employeeid) ) {
+        if (! isset($request->employeeid)) {
             throw new \Exception('getIncomeAccount - EmployeeId not specified');
         }
 
-
-        $matter = \App\GenericTableModels\matter::select(['incomeAccId','matterTypeID'])->where('RecordID',$request->matterid)->first();
+        $matter = \App\GenericTableModels\matter::select(['incomeAccId', 'matterTypeID'])->where('RecordID', $request->matterid)->first();
 
         //Matter Has Overriding Income Account
-        if ( $matter->incomeAccId ) {
-
+        if ($matter->incomeAccId) {
             $returnData->data['recordid'] = $matter->incomeAccId;
-
         } else {
-
-            $control = \App\GenericTableModels\control::select(['incomeAccOption','incomeAccId'])->first();
+            $control = \App\GenericTableModels\control::select(['incomeAccOption', 'incomeAccId'])->first();
 
             // Use Control Income Account Setting
-            if ( $control->incomeAccOption == '0') {
-
+            if ($control->incomeAccOption == '0') {
                 $returnData->data['recordid'] = $control->incomeAccId;
 
             // Use Employee Income Account Setting
-            } else if ( $control->incomeAccOption == '1') {
+            } elseif ($control->incomeAccOption == '1') {
+                $employee = \App\GenericTableModels\employee::select('incomeAccId')->where('RecordID', $request->employeeid)->first();
 
-                $employee = \App\GenericTableModels\employee::select('incomeAccId')->where('RecordID',$request->employeeid)->first();
-
-                if ( isset($employee->incomeAccId) ) {
+                if (isset($employee->incomeAccId)) {
                     $returnData->data['recordid'] = $employee->incomeAccId;
                 } else {
                     $returnData->data['recordid'] = $control->incomeAccId;
-                    $returnData->data['overrideincomeaccflag'] = 1;                
+                    $returnData->data['overrideincomeaccflag'] = 1;
                 }
 
-            // Use Cost Centre Income Account Setting
-            } else if ( $control->incomeAccOption == '2') {
+                // Use Cost Centre Income Account Setting
+            } elseif ($control->incomeAccOption == '2') {
+                if (isset($request->costcentreid)) {
+                    $costcentre = \App\GenericTableModels\costcentre::select('incomeAccId')->where('RecordID', $request->costcentreid)->first();
 
-                if ( isset($request->costcentreid) ) {
-
-                    $costcentre = \App\GenericTableModels\costcentre::select('incomeAccId')->where('RecordID',$request->costcentreid)->first();
-
-                    if ( isset($costcentre->incomeAccId) ) {
+                    if (isset($costcentre->incomeAccId)) {
                         $returnData->data['recordid'] = $costcentre->incomeAccId;
                     } else {
                         $returnData->data['recordid'] = $control->incomeAccId;
-                        $returnData->data['overrideincomeaccflag'] = 1;                
+                        $returnData->data['overrideincomeaccflag'] = 1;
                     }
-
                 } else {
                     $returnData->data['recordid'] = $control->incomeAccId;
-                    $returnData->data['overrideincomeaccflag'] = 1;                
+                    $returnData->data['overrideincomeaccflag'] = 1;
                 }
 
-            // Use Matter Type Income Account Setting
-            } else if ( $control->incomeAccOption == '3') {
+                // Use Matter Type Income Account Setting
+            } elseif ($control->incomeAccOption == '3') {
+                $mattype = \App\GenericTableModels\mattype::select('incomeAccId')->where('RecordID', $matter->matterTypeID)->first();
 
-                $mattype = \App\GenericTableModels\mattype::select('incomeAccId')->where('RecordID',$matter->matterTypeID)->first();
-
-                if ( isset($mattype->incomeAccId) ) {
+                if (isset($mattype->incomeAccId)) {
                     $returnData->data['recordid'] = $mattype->incomeAccId;
                 } else {
                     $returnData->data['recordid'] = $control->incomeAccId;
-                    $returnData->data['overrideincomeaccflag'] = 1;                
+                    $returnData->data['overrideincomeaccflag'] = 1;
                 }
-
-
             }
-
         }
 
         return json_encode($returnData);
-
 
         /*
 
@@ -475,7 +456,7 @@ $controller->checkSecurity($request);
         If ROW:Counter ! Matter Has Overriding Income Account
 
                 LOC:ReturnValue = ROW:Counter
-            
+
         ELSE
                 Case CTL:IncomeAccOption
                 Of 1
@@ -507,7 +488,7 @@ $controller->checkSecurity($request);
                 RowCounter{PROP:SQL} = 'SELECT IncomeAccId FROM MatType WHERE RecordID = (Select MatterTypeID FROM Matter WHERE RecordID = ' & TheMatterID & ')'
                 NEXT(RowCounter)
 
-                If ROW:Counter 
+                If ROW:Counter
                     LOC:ReturnValue = ROW:Counter
                 Else
                     FN:OverrideIncomeAccFlag = 1
@@ -521,14 +502,12 @@ $controller->checkSecurity($request);
 
 
         */
-
-
     }
 
     public function getCollCommPercentAndLimit(Request $request)
     {
         //getCollCommPercent   PROCEDURE  (LOC:Date)            ! Declare Procedure
-        
+
         //PROPSQLNext('SELECT Commission FROM CommissionRate WHERE ' & LOC:Date & ' >= FromDate AND ' & LOC:Date & ' <= ToDate')
         //RETURN ROW:Counter
 
@@ -536,22 +515,20 @@ $controller->checkSecurity($request);
         $returnData->commission = null;
         $returnData->limit = null;
 
-        $record = \App\GenericTableModels\commissionrate::select(['commission','limit'])
-        ->whereRaw($request->date . ' >= FromDate AND ' . $request->date .' <= ToDate')
+        $record = \App\GenericTableModels\commissionrate::select(['commission', 'limit'])
+        ->whereRaw($request->date.' >= FromDate AND '.$request->date.' <= ToDate')
         ->first();
 
         // For testing purposes
         //$date = 70000;
         //\App\GenericTableModels\commissionrate::select(['commission','limit'])->whereRaw($date . ' >= FromDate AND ' . $date .' <= ToDate')->first();
 
-        if ( $record ) {
+        if ($record) {
             $returnData->commission = $record->commission;
             $returnData->limit = $record->limit;
         }
 
         return json_encode($returnData);
-
-
     }
 
     public function addFeeNotes(Request $request)
@@ -618,16 +595,25 @@ $controller->addFeeNotes($request);
 
 */
 
-        if ( !isset($request->source) ) throw new \Exception('Source not specified - The client application must provide a source');
-        if ( !isset($request->feeitems) ) throw new \Exception('FeeItems not specified - An array of Fee Item records (feeitems[]) is required ');
+        if (! isset($request->source)) {
+            throw new \Exception('Source not specified - The client application must provide a source');
+        }
+        if (! isset($request->feeitems)) {
+            throw new \Exception('FeeItems not specified - An array of Fee Item records (feeitems[]) is required ');
+        }
 
         $returnData = new \stdClass();
 
         foreach ($request->feeitems as $feeItem) {
-
-            if ( !isset($feeItem['matterid']) ) throw new \Exception('feeItem MatterID not specified - Each Fee Item record must have a MatterId');
-            if ( !isset($feeItem['employeeid']) ) throw new \Exception('feeItem EmployeeID not specified - Each Fee Item record must have a EmployeeId');
-            if ( !isset($feeItem['costcentreid']) ) throw new \Exception('feeItem CostCentreID not specified - Each Fee Item record must have a CostCentreId');
+            if (! isset($feeItem['matterid'])) {
+                throw new \Exception('feeItem MatterID not specified - Each Fee Item record must have a MatterId');
+            }
+            if (! isset($feeItem['employeeid'])) {
+                throw new \Exception('feeItem EmployeeID not specified - Each Fee Item record must have a EmployeeId');
+            }
+            if (! isset($feeItem['costcentreid'])) {
+                throw new \Exception('feeItem CostCentreID not specified - Each Fee Item record must have a CostCentreId');
+            }
 
             $feeNote = new \stdClass();
 
@@ -637,14 +623,13 @@ $controller->addFeeNotes($request);
             $feeNote->matterid = $feeItem['matterid'];
             $feeNote->employeeid = $feeItem['employeeid'];
             $feeNote->costcentreid = $feeItem['costcentreid'];
-            
+
             $feeNote->postedflag = '0';
             $feeNote->source = $request->source;
             $feeNote->documentid = 0;
             $feeNote->partyid = 0;
 
             $feeNote->type1 = $feeItem['feesheettype'];
-
 
             $feeNote->feecodeid = $feeItem['feecodeid'];
             $feeNote->feeitemid = $feeItem['recordid'];
@@ -662,45 +647,29 @@ $controller->addFeeNotes($request);
             $feeNote->unitquantity = isset($feeNote->unitquantity) ? $feeItem['unitquantity'] : null;
             $feeNote->unittext = isset($feeNote->unitdescription) ? $feeItem['unitdescription'] : null;
 
-
-            if ( $feeNote->unitflag == '1' && isset($feeNote->unitquantity) && isset($feeNote->unittext) ) {
-
+            if ($feeNote->unitflag == '1' && isset($feeNote->unitquantity) && isset($feeNote->unittext)) {
                 $control = \App\GenericTableModels\control::select('IncludeUnitsOnAccountFlag')->first();
-    
-                if ( $control->IncludeUnitsOnAccountFlag == '1') {
 
+                if ($control->IncludeUnitsOnAccountFlag == '1') {
                     $feeNote->description .= ' (';
 
-                    if (  \App\Custom\Utils::isDecimal($feeNote->unitquantity) ) {
-
-                        $feeNote->description .= (string) round($feeNote->unitquantity,2) . ' ' . $feeNote->unittext;
-
+                    if (\App\Custom\Utils::isDecimal($feeNote->unitquantity)) {
+                        $feeNote->description .= (string) round($feeNote->unitquantity, 2).' '.$feeNote->unittext;
                     } else {
-
-                        $feeNote->description .= $feeNote->unitquantity . ' ' . $feeNote->unittext;
-
+                        $feeNote->description .= $feeNote->unitquantity.' '.$feeNote->unittext;
                     }
 
                     $feeNote->description .= ')';
-
                 }
-
             }
 
-
-            
             // Set the Income Account
-            if ( isset($feeItem['feecodebusinessledgerid']) && (int) $feeItem['feecodebusinessledgerid'] > 0) {
-
+            if (isset($feeItem['feecodebusinessledgerid']) && (int) $feeItem['feecodebusinessledgerid'] > 0) {
                 $feeNote->code2 = $feeItem['feecodebusinessledgerid'];
-
-            } else if ( isset($feeItem['feesheetbusinessledgerid']) && (int) $feeItem['feesheetbusinessledgerid'] > 0) {
-
+            } elseif (isset($feeItem['feesheetbusinessledgerid']) && (int) $feeItem['feesheetbusinessledgerid'] > 0) {
                 $feeNote->code2 = $feeItem['feesheetbusinessledgerid'];
-
             } else {
-
-                $utilsController = new \App\Http\Controllers\UtilsController;
+                $utilsController = new self;
                 $utilsRequest = new \Illuminate\Http\Request;
 
                 $utilsRequest->matterid = $feeItem['matterid'];
@@ -717,21 +686,20 @@ $controller->addFeeNotes($request);
                 $utilsRequest->employeeid = '5';
                 $result = json_decode($utilsController->getIncomeAccount($utilsRequest));
                 */
-
             }
 
-            if ( !isset($feeNote->code2) ) throw new \Exception('An error was encountered setting the Income Account of the Fee Note');
+            if (! isset($feeNote->code2)) {
+                throw new \Exception('An error was encountered setting the Income Account of the Fee Note');
+            }
 
             //$result = \App\GenericTableModels\feenote::create( (array) $feeNote);
 
             //$returnData->result = $result;
             //$returnData->data[] = $feeNote;
-            $returnData->data[] = \App\GenericTableModels\feenote::create( (array) $feeNote);
-
+            $returnData->data[] = \App\GenericTableModels\feenote::create((array) $feeNote);
         }
 
         return json_encode($returnData);
-
     }
 
     public function getFeeItems(Request $request)
@@ -748,28 +716,35 @@ $controller->getFeeItems($request);
 
 */
 
-
         $returnData = new \stdClass();
-        
-        if ( !isset($request->matterid) ) throw new \Exception('MatterId not specified');
-        if ( !isset($request->employeeid) ) throw new \Exception('EmployeeId not specified');
-        if ( !isset($request->languageid) ) throw new \Exception('LanguageId not specified');
-        if ( !isset($request->feecodes) ) throw new \Exception('Feecodes not specified - A comma separated list is required');
 
-        // Add the Linked FeeCodes
-        $linkedFees = \App\GenericTableModels\feelink::whereIn('FeeCodeId',explode(',', $request->feecodes))->get()->toArray();
-
-        foreach ($linkedFees as $linkedFee) {
-            $request->feecodes .= (',' . $linkedFee['LinkedCodeID']);
+        if (! isset($request->matterid)) {
+            throw new \Exception('MatterId not specified');
+        }
+        if (! isset($request->employeeid)) {
+            throw new \Exception('EmployeeId not specified');
+        }
+        if (! isset($request->languageid)) {
+            throw new \Exception('LanguageId not specified');
+        }
+        if (! isset($request->feecodes)) {
+            throw new \Exception('Feecodes not specified - A comma separated list is required');
         }
 
-        $todaysDate = ModelHelper::convertClarionDate( date("Y-m-d") );
+        // Add the Linked FeeCodes
+        $linkedFees = \App\GenericTableModels\feelink::whereIn('FeeCodeId', explode(',', $request->feecodes))->get()->toArray();
+
+        foreach ($linkedFees as $linkedFee) {
+            $request->feecodes .= (','.$linkedFee['LinkedCodeID']);
+        }
+
+        $todaysDate = ModelHelper::convertClarionDate(date('Y-m-d'));
 
         $genericController = new \App\Http\Controllers\GenericController;
 
         // Get the Matter
         $matterRequest = new \Illuminate\Http\Request;
-        $matterResponse = $genericController->get($matterRequest,'matter',$request->matterid);
+        $matterResponse = $genericController->get($matterRequest, 'matter', $request->matterid);
         $matter = $matterResponse['data'][0];
 
         $defendedFlag = $regionalFlag = false;
@@ -778,165 +753,145 @@ $controller->getFeeItems($request);
 
         $courtFlag = '';
 
-        $colData = \App\GenericTableModels\coldata::select(['Defended','CourtFlag'])->where('MatterId',$matter['recordid'])->first();
+        $colData = \App\GenericTableModels\coldata::select(['Defended', 'CourtFlag'])->where('MatterId', $matter['recordid'])->first();
 
-        if ( $colData ) {
+        if ($colData) {
             $defendedFlag = $colData->Defended;
             $courtFlag = $colData->CourtFlag;
-            if ( $courtFlag == 'R') $regionalFlag = true;
-        } 
+            if ($courtFlag == 'R') {
+                $regionalFlag = true;
+            }
+        }
 
         //echo 'Fee Codes = ' . $request->feecodes . "\n";
 
-        
         // Get the FeeItems
         $feeItemRequest = new \Illuminate\Http\Request;
-        $feeItemRequest->wherein = 'FeeCodeID,' . $request->feecodes;
+        $feeItemRequest->wherein = 'FeeCodeID,'.$request->feecodes;
         $feeItemRequest->employeeid = $request->employeeid;
         $feeItemRequest->languageid = $request->languageid;
 
-        if ( $regionalFlag ) {
-            $feeItemRequest->whereraw = 'RegionalCourtFlag = 1 AND (FromDate < ' . (string) $todaysDate . ' OR FromDate IS NULL)';
+        if ($regionalFlag) {
+            $feeItemRequest->whereraw = 'RegionalCourtFlag = 1 AND (FromDate < '.(string) $todaysDate.' OR FromDate IS NULL)';
         } else {
-            $feeItemRequest->whereraw = '(RegionalCourtFlag = 0 OR RegionalCourtFlag IS NULL) AND (FromDate < ' . (string) $todaysDate . ' OR FromDate IS NULL)';
+            $feeItemRequest->whereraw = '(RegionalCourtFlag = 0 OR RegionalCourtFlag IS NULL) AND (FromDate < '.(string) $todaysDate.' OR FromDate IS NULL)';
         }
 
         //echo 'WhereRaw = ' . $feeItemRequest->whereraw . "\n";
 
-        $feeItemsResponse = $genericController->get($feeItemRequest,'feeitem');
-        
+        $feeItemsResponse = $genericController->get($feeItemRequest, 'feeitem');
+
         $feeItems = $feeItemsResponse['data'];
 
         // Handle to Date
-        $feeItems = array_filter($feeItems, function($feeItem) use($todaysDate) {
+        $feeItems = array_filter($feeItems, function ($feeItem) use ($todaysDate) {
 
             //echo $feeItem['description'] . ' - ToDate = ' . $feeItem['todate'] . "\n";
 
-            if ( isset($feeItem['todate']) && (float) $feeItem['todate'] > 0 ) {
-                return( $todaysDate < $feeItem['todate'] );
+            if (isset($feeItem['todate']) && (float) $feeItem['todate'] > 0) {
+                return  $todaysDate < $feeItem['todate'];
             } else {
                 return true;
             }
-        });        
+        });
 
-        $bondData = \App\GenericTableModels\bonddata::select(['SalePrice','CapitalAmount'])->where('MatterId',$matter['recordid'])->first();
-        
-        if ( $bondData ) {
+        $bondData = \App\GenericTableModels\bonddata::select(['SalePrice', 'CapitalAmount'])->where('MatterId', $matter['recordid'])->first();
+
+        if ($bondData) {
             $salePrice = (float) $bondData->SalePrice;
             $capitalAmount = (float) $bondData->CapitalAmount;
         }
 
-        //echo '1 Count FeeItems = ' . count($feeItems) . "\n"; 
+        //echo '1 Count FeeItems = ' . count($feeItems) . "\n";
 
         // Handle To and From Amounts
-        $feeItems = array_filter($feeItems, function($feeItem) use($claimAmount, $salePrice, $capitalAmount ) {
+        $feeItems = array_filter($feeItems, function ($feeItem) use ($claimAmount, $salePrice, $capitalAmount) {
 
             //echo $feeItem['description'] . ' - ToAmount = ' . $feeItem['toamount'] . "\n";
 
-            if ( isset($feeItem['toamount']) && (float) $feeItem['toamount'] > 0 ) {
-
-                if ( $feeItem['limitedby'] == 'C') {
-
-                    if ( $claimAmount < (float) $feeItem['fromamount'] ) {
+            if (isset($feeItem['toamount']) && (float) $feeItem['toamount'] > 0) {
+                if ($feeItem['limitedby'] == 'C') {
+                    if ($claimAmount < (float) $feeItem['fromamount']) {
                         return false;
-                    } else if ( $claimAmount > (float) $feeItem['toamount'] ) {
+                    } elseif ($claimAmount > (float) $feeItem['toamount']) {
                         return false;
                     } else {
                         return true;
                     }
-
-                } else if ( $feeItem['limitedby'] == 'S') {
-
-                    if ( $salePrice < (float) $feeItem['fromamount'] ) {
+                } elseif ($feeItem['limitedby'] == 'S') {
+                    if ($salePrice < (float) $feeItem['fromamount']) {
                         return false;
-                    } else if ( $salePrice > (float) $feeItem['toamount'] ) {
+                    } elseif ($salePrice > (float) $feeItem['toamount']) {
                         return false;
                     } else {
                         return true;
                     }
-
-                } else if ( $feeItem['limitedby'] == 'B') {
-
-                    if ( $capitalAmount < (float) $feeItem['fromamount'] ) {
+                } elseif ($feeItem['limitedby'] == 'B') {
+                    if ($capitalAmount < (float) $feeItem['fromamount']) {
                         return false;
-                    } else if ( $capitalAmount > (float) $feeItem['toamount'] ) {
+                    } elseif ($capitalAmount > (float) $feeItem['toamount']) {
                         return false;
                     } else {
                         return true;
                     }
-
                 } else {
                     return true;
                 }
             } else {
                 return true;
             }
-        });        
+        });
 
         // Handle defended flag
-        $feeItems = array_filter($feeItems, function($feeItem) use($defendedFlag) {
-
-            if ( isset($feeItem['defended'])  ) {
-
-                if ( $feeItem['defended'] == 'U') {
-
-                    if ( $defendedFlag == true ) {
+        $feeItems = array_filter($feeItems, function ($feeItem) use ($defendedFlag) {
+            if (isset($feeItem['defended'])) {
+                if ($feeItem['defended'] == 'U') {
+                    if ($defendedFlag == true) {
                         return false;
                     } else {
                         return true;
                     }
-
-                } else if ( $feeItem['defended'] == 'D') {
-
-                    if ( $defendedFlag == false) {
+                } elseif ($feeItem['defended'] == 'D') {
+                    if ($defendedFlag == false) {
                         return false;
                     } else {
                         return true;
                     }
-
                 } else {
                     return true;
                 }
             } else {
                 return true;
             }
-        });        
+        });
 
         // Handle *Drawing
-        $feeItems = array_map(function($feeItem) {        
-
-            if ( stripos($feeItem['description'], '*Drawing') !== false ||  stripos($feeItem['description'], '* Drawing') !== false || stripos($feeItem['description'], '*Opstel') !== false || stripos($feeItem['description'], '* Opstel') !== false ) {
+        $feeItems = array_map(function ($feeItem) {
+            if (stripos($feeItem['description'], '*Drawing') !== false || stripos($feeItem['description'], '* Drawing') !== false || stripos($feeItem['description'], '*Opstel') !== false || stripos($feeItem['description'], '* Opstel') !== false) {
                 $feeItem['description'] = $feeItem['feecodedescription'];
             }
 
             return $feeItem;
+        }, $feeItems);
 
-        },$feeItems);
-    
         // Handle DiscountSurcharge
         $discountSurcharge = (float) $matter['discountsurcharge'];
 
-        if ( $discountSurcharge != 0 ) {
-
-            $feeItems = array_map(function($feeItem) use($discountSurcharge) {        
-
+        if ($discountSurcharge != 0) {
+            $feeItems = array_map(function ($feeItem) use ($discountSurcharge) {
                 if ($feeItem['feesheettype'] == 'F') {
-
-                    $feeItem['amount'] += round( (float) $feeItem['amount'] * ($discountSurcharge/100),2);
+                    $feeItem['amount'] += round((float) $feeItem['amount'] * ($discountSurcharge / 100), 2);
 
                     // DataTables needs this as a string
                     $feeItem['amount'] = (string) $feeItem['amount'];
-
                 }
 
                 return $feeItem;
-
-            },$feeItems);
+            }, $feeItems);
         }
 
         // Handle Maximum Amount, FeeScaleAmount and add Date, EmployeeId & CostCentreId etc
-        $feeItems = array_map(function($feeItem) use ($matter, $todaysDate) {        
-
+        $feeItems = array_map(function ($feeItem) use ($matter, $todaysDate) {
             $feeItem['date'] = (string) $todaysDate;
             $feeItem['formatteddate'] = \App\Custom\Utils::stringFromClarionDate($todaysDate);
             $feeItem['matterid'] = $matter['recordid'];
@@ -946,20 +901,18 @@ $controller->getFeeItems($request);
             $feeItem['unitquantity'] = '1';
             $feeItem['netamount'] = $feeItem['amount'];
 
-
-            if ( isset($feeItem['feescaleamount']) && (float) $feeItem['feescaleamount'] > 0) {
+            if (isset($feeItem['feescaleamount']) && (float) $feeItem['feescaleamount'] > 0) {
                 $feeItem['amount'] = $feeItem['feescaleamount'];
             }
 
-            if ( isset($feeItem['maximumamount']) && (float) $feeItem['maximumamount'] > 0) {
-                if ( (float) $feeItem['amount'] > (float) $feeItem['maximumamount'] ) {
+            if (isset($feeItem['maximumamount']) && (float) $feeItem['maximumamount'] > 0) {
+                if ((float) $feeItem['amount'] > (float) $feeItem['maximumamount']) {
                     $feeItem['amount'] = $feeItem['maximumamount'];
                 }
             }
 
             return $feeItem;
-
-        },$feeItems);
+        }, $feeItems);
 
         foreach ($feeItems as $feeItem) {
 
@@ -969,32 +922,27 @@ $controller->getFeeItems($request);
         }
 
         return json_encode($returnData);
-
     }
-
 
     public function getBasicPartyData(Request $request)
     {
-
         $returnData = new \stdClass();
-        
+
         $controller = new \App\Http\Controllers\GenericController;
         $currentPartyRequest = new \Illuminate\Http\Request;
 
-        $currentPartyRequest->whereraw = 'Party.RecordID = ' . $request->partyid;
-        $currentParty = $controller->get($currentPartyRequest,'party');
+        $currentPartyRequest->whereraw = 'Party.RecordID = '.$request->partyid;
+        $currentParty = $controller->get($currentPartyRequest, 'party');
         $returnData->currentParty = $currentParty['data'][0];
-        
 
-        $returnData->extraScreens = \App\GenericTableModels\docscrn::select(['recordid','description', 'screentype'])->orderBy('description')->get();
+        $returnData->extraScreens = \App\GenericTableModels\docscrn::select(['recordid', 'description', 'screentype'])->orderBy('description')->get();
 
-        $returnData->branches = \App\GenericTableModels\branch::select(['Branch.recordid','Branch.description','Business.RecordID AS businessbankid','Business.Description AS businessbankdescription','Trust.RecordID AS trustbankid','Trust.Description AS trustbankdescription'])
+        $returnData->branches = \App\GenericTableModels\branch::select(['Branch.recordid', 'Branch.description', 'Business.RecordID AS businessbankid', 'Business.Description AS businessbankdescription', 'Trust.RecordID AS trustbankid', 'Trust.Description AS trustbankdescription'])
         ->leftJoin('Business', 'Business.RecordID', '=', 'Branch.BusinessBankID')
-        ->leftJoin('Business as Trust', 'Trust.RecordID', '=', 'Branch.TrustBankID')            
+        ->leftJoin('Business as Trust', 'Trust.RecordID', '=', 'Branch.TrustBankID')
         ->orderBy('Branch.Description')
         ->get();
 
-        
         // $returnData->business = \App\GenericTableModels\business::select(['recordid','description', 'type'])->where('notusedflag','!=',1)->orderBy('description')->get();
         // $returnData->creditors = \App\GenericTableModels\creditor::select(['recordid','description'])->orderBy('description')->get();
 
@@ -1002,42 +950,41 @@ $controller->getFeeItems($request);
         // ->where('notusedflag','<>',1)
         // ->get();
         //$returnData->secProcs = \App\GenericTableModels\secproc::get();
-        
-        $returnData->documentSets = \App\GenericTableModels\docgen::select(['DocGen.recordid','DocGen.description','ToDoGroup.RecordID AS todogroupid','ToDoGroup.Description AS todogroupdescription'])
+
+        $returnData->documentSets = \App\GenericTableModels\docgen::select(['DocGen.recordid', 'DocGen.description', 'ToDoGroup.RecordID AS todogroupid', 'ToDoGroup.Description AS todogroupdescription'])
         ->leftJoin('ToDoGroup', 'ToDoGroup.RecordID', '=', 'DocGen.ToDoGroupID')
-        ->where('NoOfUsers','>',0)
-        ->whereNotIn('Type', ['ACC','DES'])            
-        ->orWhere('Type','GEN')
-        ->orWhere('Type','CUS')
-        ->orWhere('Code','NON')
+        ->where('NoOfUsers', '>', 0)
+        ->whereNotIn('Type', ['ACC', 'DES'])
+        ->orWhere('Type', 'GEN')
+        ->orWhere('Type', 'CUS')
+        ->orWhere('Code', 'NON')
         ->orderBy('Docgen.Description')
         ->get();
 
-        $returnData->matterTypes = \App\GenericTableModels\mattype::select(['MatType.recordid','MatType.description','FeeSheet.RecordID AS feesheetid','FeeSheet.Description AS feesheetdescription'])
+        $returnData->matterTypes = \App\GenericTableModels\mattype::select(['MatType.recordid', 'MatType.description', 'FeeSheet.RecordID AS feesheetid', 'FeeSheet.Description AS feesheetdescription'])
         ->leftJoin('FeeSheet', 'FeeSheet.RecordID', '=', 'MatType.FeeSheetID')
         ->orderBy('MatType.Description')
         ->get();
 
-        $returnData->partyEntities = \App\GenericTableModels\entity::select(['recordid','description','category','juristicflag'])->orderBy('description')->get();
-        $returnData->partyTypes = \App\GenericTableModels\partype::select(['recordid','description','category'])->orderBy('description')->get();
-        $returnData->partyRoles = \App\GenericTableModels\role::select(['recordid','description', 'rolescrnflag', 'rolescrnid'])->orderBy('description')->get();
-        $returnData->billingRates = \App\GenericTableModels\billingrate::select(['recordid','description', 'amount'])->orderBy('description')->get();
-        $returnData->telephoneTypes = \App\GenericTableModels\teletype::select(['recordid','description','internalflag'])->orderBy('description')->get();
+        $returnData->partyEntities = \App\GenericTableModels\entity::select(['recordid', 'description', 'category', 'juristicflag'])->orderBy('description')->get();
+        $returnData->partyTypes = \App\GenericTableModels\partype::select(['recordid', 'description', 'category'])->orderBy('description')->get();
+        $returnData->partyRoles = \App\GenericTableModels\role::select(['recordid', 'description', 'rolescrnflag', 'rolescrnid'])->orderBy('description')->get();
+        $returnData->billingRates = \App\GenericTableModels\billingrate::select(['recordid', 'description', 'amount'])->orderBy('description')->get();
+        $returnData->telephoneTypes = \App\GenericTableModels\teletype::select(['recordid', 'description', 'internalflag'])->orderBy('description')->get();
 
-        $returnData->docLogCategories = \App\GenericTableModels\doclogcategory::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->docLogSubCategories = \App\GenericTableModels\doclogsubcategory::select(['recordid','description'])->orderBy('description')->get();
+        $returnData->docLogCategories = \App\GenericTableModels\doclogcategory::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->docLogSubCategories = \App\GenericTableModels\doclogsubcategory::select(['recordid', 'description'])->orderBy('description')->get();
 
-        $returnData->deedsOffices = \App\GenericTableModels\lawdeed_deedsoffice::select(['recordid','name'])->orderBy('name')->get();
+        $returnData->deedsOffices = \App\GenericTableModels\lawdeed_deedsoffice::select(['recordid', 'name'])->orderBy('name')->get();
 
-
-        $returnData->costCentres = \App\GenericTableModels\costcentre::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->feeSheets = \App\GenericTableModels\feesheet::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->planOfActions = \App\GenericTableModels\todogroup::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->causeOfActions = \App\GenericTableModels\bondcause::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->stageGroups = \App\GenericTableModels\stagegroup::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->stages = \App\GenericTableModels\stage::select(['recordid','description','code','stagegroupid'])->orderBy('code')->get();
-        $returnData->countries = \App\GenericTableModels\country::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->holidays = \App\GenericTableModels\holiday::select(['recordid','description'])->orderBy('description')->get();
+        $returnData->costCentres = \App\GenericTableModels\costcentre::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->feeSheets = \App\GenericTableModels\feesheet::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->planOfActions = \App\GenericTableModels\todogroup::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->causeOfActions = \App\GenericTableModels\bondcause::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->stageGroups = \App\GenericTableModels\stagegroup::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->stages = \App\GenericTableModels\stage::select(['recordid', 'description', 'code', 'stagegroupid'])->orderBy('code')->get();
+        $returnData->countries = \App\GenericTableModels\country::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->holidays = \App\GenericTableModels\holiday::select(['recordid', 'description'])->orderBy('description')->get();
 
         $returnData->languages = \App\GenericTableModels\language::select([
             'recordid',
@@ -1060,80 +1007,76 @@ $controller->getFeeItems($request);
             'businesscreditordescription',
         ])->orderBy('description')->get();
 
-
         return json_encode($returnData);
-
     }
 
     public function getBasicData(Request $request)
     {
-
         $returnData = new \stdClass();
-        
-        $returnData->employees = \App\GenericTableModels\employee::select(['recordid','name','loginid','autodescriptionflag', 'autodescriptionseparator', 'defaultmatterdescription','defaultclientid','smtpusername','smtppassword'])->where('suspendedflag','<>',1)->orderBy('name')->get();
 
-        if ( !isset($request->employeeid) ) {
+        $returnData->employees = \App\GenericTableModels\employee::select(['recordid', 'name', 'loginid', 'autodescriptionflag', 'autodescriptionseparator', 'defaultmatterdescription', 'defaultclientid', 'smtpusername', 'smtppassword'])->where('suspendedflag', '<>', 1)->orderBy('name')->get();
+
+        if (! isset($request->employeeid)) {
             throw new \Exception('Logged In Employee\'s RecordId not specified');
         }
-        
+
         $controller = new \App\Http\Controllers\GenericController;
         $currentEmployeeRequest = new \Illuminate\Http\Request;
 
-        $currentEmployeeRequest->whereraw = 'Employee.RecordID = ' . $request->employeeid;
-        $currentEmployee = $controller->get($currentEmployeeRequest,'employee');
+        $currentEmployeeRequest->whereraw = 'Employee.RecordID = '.$request->employeeid;
+        $currentEmployee = $controller->get($currentEmployeeRequest, 'employee');
         $returnData->currentEmployee = $currentEmployee['data'][0];
-        
 
-        $returnData->extraScreens = \App\GenericTableModels\docscrn::select(['recordid','description', 'screentype'])->orderBy('description')->get();
+        $returnData->extraScreens = \App\GenericTableModels\docscrn::select(['recordid', 'description', 'screentype'])->orderBy('description')->get();
 
-        $returnData->branches = \App\GenericTableModels\branch::select(['Branch.recordid','Branch.description','Business.RecordID AS businessbankid','Business.Description AS businessbankdescription','Trust.RecordID AS trustbankid','Trust.Description AS trustbankdescription'])
+        $returnData->branches = \App\GenericTableModels\branch::select(['Branch.recordid', 'Branch.description', 'Business.RecordID AS businessbankid', 'Business.Description AS businessbankdescription', 'Trust.RecordID AS trustbankid', 'Trust.Description AS trustbankdescription'])
         ->leftJoin('Business', 'Business.RecordID', '=', 'Branch.BusinessBankID')
-        ->leftJoin('Business as Trust', 'Trust.RecordID', '=', 'Branch.TrustBankID')            
+        ->leftJoin('Business as Trust', 'Trust.RecordID', '=', 'Branch.TrustBankID')
         ->orderBy('Branch.Description')
         ->get();
-        
-        $returnData->accounts = \App\GenericTableModels\business::select(['recordid','description','type'])->orderBy('description')
-        ->where('notusedflag','<>',1)
+
+        $returnData->accounts = \App\GenericTableModels\business::select(['recordid', 'description', 'type'])->orderBy('description')
+        ->where('notusedflag', '<>', 1)
         ->get();
-        
-        $returnData->documentSets = \App\GenericTableModels\docgen::select(['DocGen.recordid','DocGen.description','ToDoGroup.RecordID AS todogroupid','ToDoGroup.Description AS todogroupdescription'])
+
+        $returnData->documentSets = \App\GenericTableModels\docgen::select(['DocGen.recordid', 'DocGen.description', 'ToDoGroup.RecordID AS todogroupid', 'ToDoGroup.Description AS todogroupdescription'])
         ->leftJoin('ToDoGroup', 'ToDoGroup.RecordID', '=', 'DocGen.ToDoGroupID')
-        ->where('NoOfUsers','>',0)
-        ->whereNotIn('Type', ['ACC','DES'])            
-        ->orWhere('Type','GEN')
-        ->orWhere('Type','CUS')
-        ->orWhere('Code','NON')
+        ->where('NoOfUsers', '>', 0)
+        ->whereNotIn('Type', ['ACC', 'DES'])
+        ->orWhere('Type', 'GEN')
+        ->orWhere('Type', 'CUS')
+        ->orWhere('Code', 'NON')
         ->orderBy('Docgen.Description')
         ->get();
 
-        $returnData->matterTypes = \App\GenericTableModels\mattype::select(['MatType.recordid','MatType.description','FeeSheet.RecordID AS feesheetid','FeeSheet.Description AS feesheetdescription'])
+        $returnData->matterTypes = \App\GenericTableModels\mattype::select(['MatType.recordid', 'MatType.description', 'FeeSheet.RecordID AS feesheetid', 'FeeSheet.Description AS feesheetdescription'])
         ->leftJoin('FeeSheet', 'FeeSheet.RecordID', '=', 'MatType.FeeSheetID')
         ->orderBy('MatType.Description')
         ->get();
 
         $returnData->secProcs = \App\GenericTableModels\secproc::get();
-        $returnData->partyEntities = \App\GenericTableModels\entity::select(['recordid','description','category','juristicflag'])->orderBy('description')->get();
-        $returnData->partyTypes = \App\GenericTableModels\partype::select(['recordid','description','category'])->orderBy('description')->get();
-        $returnData->partyRoles = \App\GenericTableModels\role::select(['recordid','description', 'rolescrnflag', 'rolescrnid'])->orderBy('description')->get();
-        $returnData->billingRates = \App\GenericTableModels\billingrate::select(['recordid','description', 'amount'])->orderBy('description')->get();
-        $returnData->telephoneTypes = \App\GenericTableModels\teletype::select(['recordid','description','internalflag'])->orderBy('description')->get();
+        $returnData->partyEntities = \App\GenericTableModels\entity::select(['recordid', 'description', 'category', 'juristicflag'])->orderBy('description')->get();
+        $returnData->partyTypes = \App\GenericTableModels\partype::select(['recordid', 'description', 'category'])->orderBy('description')->get();
+        $returnData->partyRoles = \App\GenericTableModels\role::select(['recordid', 'description', 'rolescrnflag', 'rolescrnid'])->orderBy('description')->get();
+        $returnData->billingRates = \App\GenericTableModels\billingrate::select(['recordid', 'description', 'amount'])->orderBy('description')->get();
+        $returnData->telephoneTypes = \App\GenericTableModels\teletype::select(['recordid', 'description', 'internalflag'])->orderBy('description')->get();
 
-        $returnData->docLogCategories = \App\GenericTableModels\doclogcategory::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->docLogSubCategories = \App\GenericTableModels\doclogsubcategory::select(['recordid','description'])->orderBy('description')->get();
+        $returnData->docLogCategories = \App\GenericTableModels\doclogcategory::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->docLogSubCategories = \App\GenericTableModels\doclogsubcategory::select(['recordid', 'description'])->orderBy('description')->get();
 
-        $returnData->deedsOffices = \App\GenericTableModels\lawdeed_deedsoffice::select(['recordid','name'])->orderBy('name')->get();
+        $returnData->deedsOffices = \App\GenericTableModels\lawdeed_deedsoffice::select(['recordid', 'name'])->orderBy('name')->get();
 
-        $returnData->business = \App\GenericTableModels\business::select(['recordid','description', 'type'])->where('notusedflag','!=',1)->orderBy('description')->get();
-        $returnData->creditors = \App\GenericTableModels\creditor::select(['recordid','description'])->orderBy('description')->get();
+        $returnData->business = \App\GenericTableModels\business::select(['recordid', 'description', 'type'])->where('notusedflag', '!=', 1)->orderBy('description')->get();
+        $returnData->creditors = \App\GenericTableModels\creditor::select(['recordid', 'description'])->orderBy('description')->get();
 
-        $returnData->costCentres = \App\GenericTableModels\costcentre::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->feeSheets = \App\GenericTableModels\feesheet::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->planOfActions = \App\GenericTableModels\todogroup::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->causeOfActions = \App\GenericTableModels\bondcause::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->stageGroups = \App\GenericTableModels\stagegroup::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->stages = \App\GenericTableModels\stage::select(['recordid','description','code','stagegroupid'])->orderBy('code')->get();
-        $returnData->countries = \App\GenericTableModels\country::select(['recordid','description'])->orderBy('description')->get();
-        $returnData->holidays = \App\GenericTableModels\holiday::select(['recordid','description'])->orderBy('description')->get();
+        $returnData->costCentres = \App\GenericTableModels\costcentre::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->feeSheets = \App\GenericTableModels\feesheet::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->planOfActions = \App\GenericTableModels\todogroup::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->causeOfActions = \App\GenericTableModels\bondcause::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->stageGroups = \App\GenericTableModels\stagegroup::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->stages = \App\GenericTableModels\stage::select(['recordid', 'description', 'code', 'stagegroupid'])->orderBy('code')->get();
+        $returnData->countries = \App\GenericTableModels\country::select(['recordid', 'description'])->orderBy('description')->get();
+        $returnData->holidays = \App\GenericTableModels\holiday::select(['recordid', 'description'])->orderBy('description')->get();
 
         $returnData->languages = \App\GenericTableModels\language::select([
             'recordid',
@@ -1156,21 +1099,16 @@ $controller->getFeeItems($request);
             'businesscreditordescription',
         ])->orderBy('description')->get();
 
-
         return json_encode($returnData);
-
     }
 
     public function getBasicDataMobileApp(Request $request)
-
     {
-
         $returnData = new \stdClass();
 
         $returnData->employees = \App\GenericTableModels\employee::select(['recordid', 'name', 'loginid', 'autodescriptionflag', 'autodescriptionseparator', 'defaultmatterdescription', 'defaultclientid', 'smtpusername', 'smtppassword'])->where('suspendedflag', '<>', 1)->orderBy('name')->get();
 
-        if (!isset($request->employeeid)) {
-
+        if (! isset($request->employeeid)) {
             throw new \Exception('Logged In Employee\'s RecordId not specified');
         }
 
@@ -1178,7 +1116,7 @@ $controller->getFeeItems($request);
 
         $currentEmployeeRequest = new \Illuminate\Http\Request;
 
-        $currentEmployeeRequest->whereraw = 'Employee.RecordID = ' . $request->employeeid;
+        $currentEmployeeRequest->whereraw = 'Employee.RecordID = '.$request->employeeid;
 
         $currentEmployee = $controller->get($currentEmployeeRequest, 'employee');
 
@@ -1234,54 +1172,50 @@ $controller->getFeeItems($request);
         $returnData->stageGroups = \App\GenericTableModels\stagegroup::select(['recordid', 'description'])->orderBy('description')->get();
 
         return json_encode($returnData);
-
     }
 
     public function logs(Request $request)
     {
-
         $disk = Storage::disk('logs');
         $files = $disk->files();
-    
+
         $fileData = collect();
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $fileData->push([
                 'file' => $file,
-                'date' => $disk->lastModified($file )
+                'date' => $disk->lastModified($file),
             ]);
         }
         $newest = $fileData->sortByDesc('date')->first();
-        
+
         $contents = Storage::disk('logs')->get($newest['file']);
 
         $array = explode("\n", $contents);
 
         $i = 1;
 
-        foreach($array as $val) {
-        $tempArray[] = explode("\\n", $val);
-        if($i < count($array)) {
-            $tempArray[] = '-----------------------------------------------------------';
-        }
-        $i++;
+        foreach ($array as $val) {
+            $tempArray[] = explode('\\n', $val);
+            if ($i < count($array)) {
+                $tempArray[] = '-----------------------------------------------------------';
+            }
+            $i++;
         }
 
         return $tempArray;
-
     }
-
 
     public function clearlogs(Request $request)
     {
         $disk = Storage::disk('logs');
         $files = $disk->files();
-    
+
         $fileData = collect();
-        
-        foreach($files as $file) {
+
+        foreach ($files as $file) {
             $fileData->push([
                 'file' => $file,
-                'date' => $disk->lastModified($file )
+                'date' => $disk->lastModified($file),
             ]);
         }
         $newest = $fileData->sortByDesc('date')->first();
@@ -1290,11 +1224,10 @@ $controller->getFeeItems($request);
         Log::info('New Log File');
 
         return 'Logs Cleared';
-
     }
 
-    public function getPhpInfo() {
+    public function getPhpInfo()
+    {
         return phpinfo();
     }
-
 }

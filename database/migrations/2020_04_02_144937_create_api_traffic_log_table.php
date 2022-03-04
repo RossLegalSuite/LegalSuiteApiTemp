@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateApiTrafficLogTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -31,7 +30,6 @@ class CreateApiTrafficLogTable extends Migration
             $table->Text('header')->nullable();
 
             $table->timestamps();
-
         });
     }
 
@@ -44,4 +42,4 @@ class CreateApiTrafficLogTable extends Migration
     {
         Schema::dropIfExists('apitrafficlog');
     }
-}
+};
