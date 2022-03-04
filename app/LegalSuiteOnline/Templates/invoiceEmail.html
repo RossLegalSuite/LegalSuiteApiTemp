@@ -1,0 +1,13 @@
+<component is="salutation">[Salutation]</component>
+
+<h4>{{matter.fileRef}} - {{matter.description}}</h4>
+
+<div v-if="invoice.type == 'Invoice'">
+    <p>Attached please find our invoice for services rendered with regard to the above Matter for your attention.</p>
+</div>
+
+<div v-else>
+    <p>Attached please find a <strong><em>proforma invoice</em></strong> for services rendered with regard to the above Matter for your attention.</p>
+</div>
+
+<component is="valediction">[Valediction]</component>

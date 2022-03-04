@@ -1,0 +1,23 @@
+<h2 class="text-center">Matter Trust Balance</h2>
+<p class="text-right">Date: {{todaysDate}}</p>
+
+<table class="table table-sm no-border">
+	<thead>
+		<tr class="bg-gray">
+			<th class="text-nowrap border">File Ref</th>
+			<th class="text-nowrap border">Description</th>
+			<th class="text-nowrap border">Client</th>
+			<th class="text-nowrap border text-right">Business Balance</th>
+			<th class="text-nowrap border text-right">Trust Balance</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-bind:key="matter.id" v-for="matter in matters">
+			<td class="text-nowrap border">{{matter.fileRef}}</td>
+			<td class="text-nowrap border">{{matter.description}}</td>
+			<td class="text-nowrap border">{{matter.client}}</td>
+			<td class="text-nowrap border text-right">{{matter.businessBalance}}</td>
+			<td class="text-nowrap border text-right">{{matter.trustBalance}}</td>
+		</tr>
+	</tbody>
+</table>

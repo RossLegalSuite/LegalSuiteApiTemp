@@ -1,0 +1,17 @@
+<div>
+    <span v-if="company.physicalline1">{{company.physicalline1}}</span>
+    <span v-if="company.physicalline1">&bull; {{company.physicalline2}}</span>
+    <span v-if="company.physicalline3">&bull; {{company.physicalline3}}</span>
+    <span v-if="company.physicalcode">&bull; {{company.physicalcode}}</span>
+</div>
+<div>
+    <span v-if="company.postalline1">{{company.postalline1}}</span>
+    <span v-if="company.postalline1">&bull; {{company.postalline2}}</span>
+    <span v-if="company.postalline3">&bull; {{company.postalline3}}</span>
+    <span v-if="company.postalcode">&bull; {{company.postalcode}}</span>
+</div>
+<div>
+    <span v-if="company.work" class="text-nowrap">Tel: {{company.work}}</span>
+    <span v-if="company.email" class="text-nowrap">&bull; Email: {{company.email}}</span>
+    <span v-if="company.website" class="text-nowrap">&bull; Web: {{company.website}}</span>
+</div>

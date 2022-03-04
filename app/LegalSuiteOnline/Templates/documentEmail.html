@@ -1,0 +1,24 @@
+<p>Hi</p>
+
+<div v-if="documents.length > 1">
+
+	<p>Attached please find the following documents for your attention:</p>
+
+	<table class="table table-sm no-border">
+		<thead>
+			<tr class="bg-gray">
+				<th class="text-nowrap border">Document</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-bind:key="document.id" v-for="document in documents">
+				<td class="text-nowrap border">{{document.description}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div v-else="">
+	<p>Attached please find <span class="font-weight-bold font-italic">{{documents[0].description}}</span> attached for your attention.</p>
+</div>
+
+<component is="valediction">[Valediction]</component>

@@ -1,0 +1,55 @@
+<table class="w-100">
+	<tbody>
+		<tr>
+			<td class="w-65 text-top">
+				<component is="companyLogo">[Company Logo]</component>
+				<component is="companyAddress">[Company Address]</component>
+				<br/>
+			</td>
+			<td class="text-right text-top">
+                <h2>Receipt</h2>
+                <h4><span class="font-weight-bold">Number: </span><span>{{receipt.number}}</span></h4>
+                <h4><span class="font-weight-bold">Date:</span><span> {{receipt.date}}</span></h4>
+				<h4><span class="font-weight-bold text-right">Amount:</span><span> {{company.currencySymbol}}{{receipt.amount}}</span></h4>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
+<div class="card w-50 mb-5">
+	<div class="card-header p-2">Received From</div>
+	<div class="card-body p-2">
+		<div>{{party.name}}</div>
+		<component is="partyPostal">[Party Postal]</component>
+	</div>
+</div>
+
+<h4>Receipt</h4>
+
+<p>This Receipt was allocated to the following Matters:</p>
+
+<table class="table table-sm no-border w-100">
+	<thead>
+		<tr class="bg-gray">
+			<th class="border">Matter</th>
+			<th class="border">Description</th>
+			<th class="border text-right">Amount</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-bind:key="transaction.id" v-for="transaction in transactions">
+			<td class="text-nowrap border">{{transaction.matterFileRef}}</td>
+			<td class="border w-80">{{transaction.matterDescription}}</td>
+			<td class="border text-right">{{transaction.amount}}</td>
+		</tr>
+		<tr>
+			<td class="border">&nbsp;</td>
+			<td class="border">&nbsp;</td>
+			<td class="border">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="text-nowrap no-border text-right font-weight-bold" colspan="2">Receipt Total</td>
+			<td class="text-nowrap border text-right font-weight-bold">{{company.currencySymbol}}{{receipt.amount}}</td>
+		</tr>
+	</tbody>
+</table>

@@ -1,0 +1,591 @@
+.btn-lookup {
+    background-color: lightslategray;
+    border-color: lightslategray;
+    color: white;
+}
+
+.btn-lookup:hover {
+    background-color: gray;
+    border-color: gray;
+    color: white;
+}
+
+.btn-primary,
+.btn-danger {
+    color: #fff !important; /*Fix bug in BS4 where card-header overrides button color*/
+}
+
+/**********************************************
+           Custom - Start
+**********************************************/
+
+.table-functions-row {
+    margin-bottom: 0.25rem;
+}
+
+/* Bootstrap Vue CheckBox */
+.custom-control.custom-checkbox {
+    cursor: pointer;
+}
+
+/* Fixes for b-dropdown */
+.dropdown-item:focus.text-primary {
+    outline: steelblue !important;
+    color: #fff !important;
+    background-color: steelblue !important;
+}
+
+.dropdown-item:focus.text-danger {
+    outline: indianred !important;
+    color: #fff !important;
+    background-color: indianred !important;
+}
+
+.dropdown-item:focus.text-success {
+    outline: indianred !important;
+    color: #fff !important;
+    background-color: forestgreen !important;
+}
+
+.dropdown-item:active.text-primary {
+    color: #fff;
+    background-color: steelblue !important;
+}
+
+.dropdown-item:active.text-danger {
+    color: #fff;
+    background-color: indianred !important;
+}
+
+.dropdown-item:active.text-success {
+    color: #fff;
+    background-color: forestgreen !important;
+}
+
+.dropdown-menu {
+    box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.25);
+}
+/* End: Fixes for b-dropdown */
+
+.iframe-container {
+    display: flex;
+    align-items: stretch;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.template-container {
+    position: relative;
+    /* padding-bottom: 2.5rem; */
+}
+
+/* 26 Mar 2020 - Footer not working */
+
+/* .template-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+} */
+
+.template-container .border {
+    border: 1px solid rgba(0, 0, 0, 0.5) !important;
+}
+
+.template-container .card {
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    border-top-left-radius: 7px !important;
+    border-bottom-left-radius: 7px !important;
+}
+
+.template-container .card-header {
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+
+    /* border-top-left-radius: 7px !important; */
+}
+
+.template-container .card-header,
+.template-container .card-footer {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.text-anchor {
+    cursor: pointer;
+    color: #4682b4;
+}
+
+.text-anchor:hover {
+    color: #315a7d;
+    text-decoration: underline;
+}
+
+/* Rotate a font awesome icon */
+
+/* https://stackoverflow.com/questions/52225228/font-awesome-spinner-not-spinning */
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spinner {
+    /* Apply 'spinner' keyframes looping once every second (1s)  */
+    animation: spinner 2s linear infinite;
+}
+
+/* MultiSelect mods */
+.multiselect__option--selected.multiselect__option--highlight {
+    background: steelblue !important;
+}
+
+.input-group .multiselect {
+    flex: 1 1 auto;
+    width: 80% !important;
+    cursor: pointer;
+}
+
+.multiselect__tags,
+.multiselect__content-wrapper {
+    border: 1px solid slategray !important;
+}
+
+.multiselect__single {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.input-group .multiselect__tags {
+    border-radius: 5px 0px 0px 5px !important;
+}
+
+/* v-select mods */
+.input-group .v-select {
+    flex: 1 1 auto;
+    cursor: pointer;
+}
+
+.vs__actions {
+    cursor: pointer;
+}
+
+.vs__dropdown-toggle {
+    background: white !important;
+    border: 1px solid slategray !important;
+    padding: 2px 2px 6px 2px !important;
+}
+
+.vs__selected-options,
+.vs__selected {
+    width: 80% !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.vs__selected {
+    display: inline-block !important;
+}
+
+.fa-15x {
+    font-size: 1.3333333333em;
+}
+
+.border-red {
+    border-color: crimson !important;
+}
+
+.text-red {
+    color: crimson !important;
+}
+
+.btn-group button.dropdown-toggle {
+    border-left: 1px solid white !important;
+}
+
+ul.leaders {
+    max-width: 40em;
+    padding: 0;
+    overflow-x: hidden;
+    list-style: none;
+}
+
+ul.leaders li {
+    margin-top: 0.5rem;
+}
+
+ul.leaders li:before {
+    float: left;
+    width: 0;
+    white-space: nowrap;
+    content: ". . . . . . . . . . . . . . . . . . . . "
+        ". . . . . . . . . . . . . . . . . . . . "
+        ". . . . . . . . . . . . . . . . . . . . "
+        ". . . . . . . . . . . . . . . . . . . . ";
+}
+ul.leaders span:first-child {
+    padding-right: 0.33em;
+    background: white;
+}
+
+ul.leaders span + span {
+    float: right;
+    padding-left: 0.33em;
+    background: white;
+}
+
+.btn-important {
+    color: ghostwhite !important;
+    background-color: brown;
+    border-color: brown;
+}
+
+.bootstrap-datetimepicker-widget table td.day {
+    height: 14px !important;
+    line-height: 14px !important;
+    width: 14px !important;
+    padding: 0.3rem !important;
+}
+
+.input-group-text {
+    border: 1px solid slategray;
+    font-weight: 800;
+}
+
+.centercenter {
+    margin: 0px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+
+.dropdown-toggle.btn-light {
+    border: 1px solid slategray;
+}
+
+.btn-light {
+    background-color: #e9ecef !important;
+}
+
+.datatables-search {
+    margin-bottom: 0.5rem;
+}
+.datatables-search-input-group {
+    display: inline-block;
+}
+
+.datatables-search-button {
+    margin-left: 0.5rem;
+}
+
+.table tbody {
+    background-color: white;
+}
+
+fieldset {
+    background-color: white;
+    padding: 1rem;
+    padding-left: 1rem;
+    border-radius: 4px;
+    border: 1px solid gray;
+}
+fieldset legend {
+    background-color: steelblue;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    width: unset;
+}
+
+fieldset .form-group {
+    background-color: transparent;
+}
+
+legend {
+    margin-bottom: 0px !important;
+}
+
+.card {
+    background-color: transparent;
+}
+.card-header {
+    padding: 0.75rem;
+}
+.card-header,
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.card-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 2px solid #eaf2f9;
+}
+
+.bg-gray {
+    background-color: #2b3e50;
+    color: ghostwhite;
+}
+
+.bg-green {
+    background-color: #1abc9c !important;
+    color: ghostwhite !important;
+}
+
+.bg-red {
+    background-color: indianred !important;
+    color: ghostwhite !important;
+}
+
+.bg-blue {
+    background-color: steelblue !important;
+    color: ghostwhite !important;
+}
+
+.icon-danger {
+    color: indianred;
+    cursor: pointer;
+}
+
+.icon-danger:hover {
+    color: #c43f3f;
+}
+
+.btn-lookup {
+    background-color: lightslategray;
+    border-color: lightslategray;
+    color: white;
+}
+
+.btn-lookup:hover {
+    background-color: gray;
+    border-color: gray;
+    color: white;
+}
+
+/* Fix max-width setting in bootstrap */
+/* Fix popover overflow hidden in modals */
+.popover {
+    /* max-width:1000px;
+    z-index: 10001;
+    position: fixed; */
+    box-shadow: 4px 4px 3px rgba(0, 0, 0, 0.25);
+}
+
+.popover-icon {
+    font-size: 1.3333333333em;
+    line-height: 0.75em;
+    vertical-align: -15%;
+    color: steelblue;
+    margin-left: 7px;
+    cursor: pointer;
+}
+
+/* Need this for PrintThis() plugin */
+iframe {
+    width: 100%;
+    height: 500px;
+}
+
+/* Larger check boxes */
+input[type="checkbox"] {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+.d-hide {
+    display: none;
+}
+
+.text-shadow {
+    text-shadow: 0.025em 0.025em 0.025em grey;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 700;
+}
+
+.nav-tabs .nav-item .nav-link {
+    color: black;
+    border-top: 1px solid gray;
+    border-right: 1px solid gray;
+    border-left: 1px solid gray;
+    margin-right: 0.65rem;
+    box-shadow: 0.2rem -0.1rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+.font-larger {
+    font-size: larger;
+}
+
+.badge-danger,
+.btn-danger {
+    background-color: indianred;
+}
+.badge-primary,
+.btn-primary {
+    background-color: steelblue;
+    color: #fff !important; /*Fix bug in BS4 where card-header overrides button color*/
+}
+.badge-success,
+.btn-success {
+    background-color: forestgreen;
+    color: #fff !important; /*Fix bug in BS4 where card-header overrides button color*/
+}
+
+a.btn {
+    border-color: transparent !important; /*Fix bug in BS4 where anchor buttons had no border radius*/
+}
+
+.badge,
+.cp {
+    cursor: pointer;
+}
+
+/* For Action button Group */
+.btn-group.show .dropdown-menu.show {
+    left: -100px !important;
+}
+
+.btn-group.show .dropdown-menu button {
+    padding: 0px 10px !important;
+}
+/* .btn-group.show .dropdown-menu.show {
+    background-color: #4682b4;
+    border-color: #4682b4;
+}
+
+.btn-group.show .dropdown-item {
+    color: ghostwhite;
+}
+
+.btn-group.show .dropdown-item:hover {
+    background-color: #3b6e98;
+    border-color: #38678f;
+} */
+
+/* For Select Picker */
+/* .dropdown-menu.show {
+    background-color: lightgrey;
+} */
+
+.bs-actionsbox {
+    margin-bottom: 0.5rem !important;
+    margin-top: 0.25rem !important;
+}
+
+.bs-actionsbox button {
+    color: #fff !important;
+    background-color: #00c9a7 !important;
+    border-color: #00c9a7 !important;
+    border-radius: 3px !important;
+}
+
+.bs-select-all {
+    margin-right: 0.5rem !important;
+    /* margin-left: 0.5rem !important; */
+}
+
+.bs-deselect-all {
+    margin-right: 0.5rem !important;
+    /* margin-left: 0.5rem !important; */
+}
+
+/* .dropdown-menu .inner  {
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+} */
+
+/* .dropdown-menu .inner li {
+    margin-right: 1rem !important;
+    margin-left: 1rem !important;
+} */
+
+.dropdown-menu .inner li a {
+    border: 2px solid transparent;
+    border-radius: 0.25rem !important;
+}
+
+.top-right {
+    position: absolute;
+    top: 0.35em;
+    right: 0.35em;
+}
+
+.shadowed {
+    box-shadow: 4px 4px 3px rgba(0, 0, 0, 0.25);
+}
+
+.boxed {
+    border-radius: 4px;
+    border: 1px solid slategray;
+    box-shadow: 4px 4px 3px rgba(0, 0, 0, 0.25);
+}
+/* .boxed-radio {
+    border-radius: 4px;
+    border: 1px solid slategray;
+    padding: 0.75em 0em;
+    
+} */
+
+.bordered-top-radius {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.bordered-bottom-radius {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.page-center {
+    height: 100vh;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.page-bottom {
+    height: 90vh;
+    align-items: flex-end;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.page-title {
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 95%;
+}
+
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4,
+.alert h1,
+.alert h2,
+.alert h3,
+.alert h4 {
+    margin-bottom: 0px !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    font-weight: bold;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/**********************************************
+           Custom - End
+**********************************************/

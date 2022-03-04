@@ -1,0 +1,91 @@
+<table class="w-100">
+	<tbody>
+		<tr>
+			<td class="w-65 text-top">
+				<component is="companyLogo">[Company Logo]</component>
+				<component is="companyAddress">[Company Address]</component>
+				<br/>
+			</td>
+			<td class="text-right text-top">
+
+				<div v-if="invoice.type == 'Invoice'">
+
+					<h2><span v-if="company.salesTaxType == 'Vat'">Tax </span>Invoice</h2>
+
+					<h4><span class="font-weight-bold">Number: </span><span>{{invoice.number}}</span></h4>
+				</div>
+
+				<div v-else="">
+
+					<h2>Proforma Invoice</h2>
+
+					<h4><span class="font-weight-bold">Number: </span><span>P-{{invoice.number}}</span></h4>
+				</div>
+
+				<h4><span class="font-weight-bold">Date:</span><span> {{invoice.date}}</span></h4>
+
+				<h4><span class="font-weight-bold">Our Ref:</span><span> {{matter.fileRef}}</span></h4>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
+
+<div class="card w-50 mb-5">
+	<div class="card-header p-2">
+		<span v-if="invoice.type == 'Quotation'">To</span>
+		<span v-else="">Bill To</span>
+	</div>
+	<div class="card-body p-2">
+		<div>{{party.name}}</div>
+		<component is="partyPostal">[Party Postal]</component>
+	</div>
+</div>
+
+
+<h4 class="text-truncate">Matter: {{matter.description}}</h4>
+<div class="row">
+	<div class="col-md-12">
+
+		<table class="table table-sm no-border">
+			<thead>
+				<tr class="bg-gray">
+					<th class="border">Date</th>
+					<th class="border">Description</th>
+					<th class="border">{{company.salesTaxType}}</th>
+					<th class="border text-right">Amount</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-bind:key="transaction.dateTime + transaction.id" v-for="transaction in transactions">
+					<td class="text-nowrap border">{{transaction.date}}</td>
+					<td class="border w-80">{{transaction.description}}</td>
+					<td class="border text-right">{{transaction.taxAmount}}</td>
+					<td class="border text-right">{{transaction.amount}}</td>
+				</tr>
+				<tr>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="text-nowrap no-border text-right" colspan="3">Sub Total</td>
+					<td class="text-nowrap border text-right">{{company.currencySymbol}} {{invoice.debits}}</td>
+				</tr>
+				<tr>
+					<td class="text-nowrap no-border text-right" colspan="3">{{$root.company.salesTaxType}}</td>
+					<td class="text-nowrap border text-right">{{company.currencySymbol}} {{invoice.tax}}</td>
+				</tr>
+				<tr v-if="invoice.credits !== '0.00'">
+					<td class="text-nowrap no-border text-right" colspan="3">Less Receipts</td>
+					<td class="text-nowrap border text-right">{{company.currencySymbol}} {{invoice.credits}}</td>
+				</tr>
+				<tr>
+					<td class="text-nowrap no-border text-right font-weight-bold" colspan="3">Total Due</td>
+					<td class="text-nowrap border text-right font-weight-bold">{{company.currencySymbol}} {{invoice.balance}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

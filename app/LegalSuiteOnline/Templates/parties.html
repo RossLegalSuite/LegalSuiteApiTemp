@@ -1,0 +1,28 @@
+<h2 class="text-center">Parties</h2>
+<p class="text-right">Date: {{todaysDate}}</p>
+
+<table class="table table-sm no-border">
+	<thead>
+		<tr class="bg-gray">
+			<th class="text-nowrap border">Name</th>
+			<th class="text-nowrap border">Postal</th>
+			<th class="text-nowrap border">Contact Details</th>
+			<th class="text-nowrap border text-right">Trust Balance</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-bind:key="party.id" v-for="party in parties">
+			<td class="text-nowrap border">{{party.name}}</td>
+			<td class="text-nowrap border">{{party.postalLine1}}</td>
+			<td class="text-nowrap border">
+
+				<div v-bind:key="contact.id" v-for="contact in party.contacts">
+					<span class="font-weight-bold">{{contact.method}}: </span>
+					<span>{{contact.description}}</span>
+				</div>
+
+			</td>
+			<td class="text-nowrap border text-right">{{party.trustBalance}}</td>
+		</tr>
+	</tbody>
+</table>

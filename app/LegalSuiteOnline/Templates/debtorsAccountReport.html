@@ -1,0 +1,71 @@
+<h2 class="text-center">{{report.title}}</h2>
+<h4 v-if="report.subTitle" class="text-center">{{report.subTitle}}</h4>
+
+<table class="w-100 mb-2">
+    <tbody>
+        <tr>
+            <td class="w-75 text-bottom">
+                <strong>Printed By:</strong> {{employee.name}}
+                <br/>
+                <strong>Printed On:</strong> {{report.date}}
+            </td>
+            <td class="w-25">
+                <table class="w-100">
+                    <tbody>
+                        <tr>
+                            <td class="w-65 font-weight-bold">
+                                Cost Balance:
+                            </td>
+                            <td class="text-nowrap text-right">
+                                {{$root.formatMoney(matter.debtorscostbalance)}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-65 font-weight-bold">
+                                Interest Balance:
+                            </td>
+                            <td class="text-nowrap text-right">
+                                {{$root.formatMoney(matter.debtorsinterestbalance)}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-65 font-weight-bold">
+                                Capital Balance:
+                            </td>
+                            <td class="text-nowrap text-right">
+                                {{$root.formatMoney(matter.debtorscapitalbalance)}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-65 font-weight-bold">
+                                Debtor's Balance:
+                            </td>
+                            <td class="text-nowrap text-right">
+                                {{$root.formatMoney(matter.debtorsbalance)}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<table class="table table-sm no-border w-100">
+    <thead>
+        <tr class="bg-gray">
+            <th class="border" v-bind:key="column.title" v-for="column in report.columns">
+                {{column.title}}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-bind:key="row.id" v-for="row in report.rows">
+            <td class="border" v-bind:key="column.title" v-for="column in report.columns">
+                <div v-html="column.render(row)"></div>
+            </td>
+        </tr>
+    </tbody>
+
+</table>

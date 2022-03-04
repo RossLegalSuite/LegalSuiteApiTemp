@@ -1,0 +1,59 @@
+<h2 class="text-center">Income Statement</h2>
+<h3 class="text-center">{{company.name}}</h3>
+<div class="text-center mb-5">As at {{todaysDate}}</div>
+
+
+
+<table class="table table-sm no-border w-100">
+
+	<tbody>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="3">
+				<h4 class="mb-1 font-weight-bold">Income</h4>
+			</td>
+		</tr>
+
+		<tr class="no-border" v-bind:key="income.id" v-for="income in incomeAccounts">
+			<td class="text-nowrap no-border">{{income.description}}</td>
+			<td class="text-nowrap no-border text-right">{{income.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Income</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalIncome}}</td>
+		</tr>
+		
+		<tr class="no-border">
+			<td class="no-border" colspan="3">
+				<h4 class="mt-4 mb-1 font-weight-bold">Expenses</h4>
+			</td>
+		</tr>
+		
+		<tr class="no-border" v-bind:key="expense.id" v-for="expense in expenseAccounts">
+			<td class="text-nowrap no-border">{{expense.description}}</td>
+			<td class="text-nowrap no-border text-right">{{expense.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Expenses</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalExpenses}}</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="3">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="2"><h4 >Net Income</h4></td>
+			<td class="no-border text-right font-weight-bold">{{netIncome}}</td>
+		</tr>
+
+	</tbody>
+
+</table>
+

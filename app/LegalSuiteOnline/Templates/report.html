@@ -1,0 +1,24 @@
+<component is="reportHeader">[Reportheader]</component>
+<h1 class="text-center">{{report.title}}</h1>
+<h3 v-if="report.subTitle" class="text-center">{{report.subTitle}}</h3>
+<div><strong>Printed By:</strong> {{employee.name}}</div>
+<div><strong>Printed On:</strong> {{report.date}}</div>
+
+<table class="table table-sm no-border w-100">
+    <thead>
+        <tr class="bg-gray">
+            <th class="border" v-bind:key="column.title" v-for="column in report.columns">
+                {{column.title}}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-bind:key="row.id" v-for="row in report.rows">
+            <td class="border" v-bind:key="column.title" v-for="column in report.columns">
+                <div v-html="column.render(row)"></div>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+

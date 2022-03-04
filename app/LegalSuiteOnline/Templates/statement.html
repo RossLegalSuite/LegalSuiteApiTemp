@@ -1,0 +1,136 @@
+<table class="w-100">
+	<tbody>
+		<tr>
+			<td class="w-65 text-top">
+				<component is="companyLogo">[Company Logo]</component>
+				<component is="companyAddress">[Company Address]</component>
+				<br/>
+			</td>
+			<td class="text-right text-top">
+				<h2>Statement</h2>
+				<div><strong>Date:</strong> {{todaysDate}}</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
+<div class="card w-50">
+	<div class="card-header p-2">Client</div>
+	<div class="card-body p-2">
+		<div>{{party.name}}</div>
+		<component is="partyPostal">[Party Postal]</component>
+	</div>
+</div>
+<br/>
+<div class="no-page-break" v-bind:key="matter.id" v-for="matter in matters">
+
+	<h4 class="text-truncate">{{matter.matter}}</h4>
+
+	<table class="table table-sm no-border">
+		<thead>
+			<tr class="bg-gray">
+				<th class="text-nowrap border">Date</th>
+				<th class="text-nowrap border">Description</th>
+				<th class="text-nowrap border">Document</th>
+				<th class="text-nowrap border text-right">Debit</th>
+				<th class="text-nowrap border text-right">Credit</th>
+				<th class="text-nowrap border text-right">Balance</th>
+			</tr>
+		</thead>
+
+
+		<tbody>
+			<tr v-bind:key="transaction.transactionId" v-for="transaction in matter.statementTransactions">
+				<td class="text-nowrap border">{{transaction.date}}</td>
+				<td class="text-nowrap border">{{transaction.type}}</td>
+				<td class="text-nowrap border">{{transaction.document}}</td>
+				<td class="text-nowrap border text-right">{{transaction.debit}}</td>
+				<td class="text-nowrap border text-right">{{transaction.credit}}</td>
+				<td class="text-nowrap border text-right">{{transaction.balance}}</td>
+			</tr>
+			<tr v-if="!matter.statementTransactions.length">
+				<td class="border">&nbsp;</td>
+				<td class="border">&nbsp;</td>
+				<td class="border">&nbsp;</td>
+				<td class="border">&nbsp;</td>
+				<td class="border">&nbsp;</td>
+				<td class="border">&nbsp;</td>
+			</tr>
+		</tbody>
+
+		<tfoot>
+			<tr>
+				<td class="no-border text-right font-weight-bold" colspan="5">Balance</td>
+				<td class="border text-right font-weight-bold">{{matter.statementBalance}}</td>
+			</tr>
+		</tfoot>
+	</table>
+
+</div>
+
+<div class="no-page-break">
+
+	<h4 v-if="matters.length">Summary</h4>
+
+	<table class="table table-sm no-border">
+		<thead>
+			<tr class="bg-gray">
+				<th class="text-nowrap border">Matter</th>
+				<th class="text-nowrap border">Description</th>
+				<th class="text-nowrap border text-right">Balance</th>
+			</tr>
+		</thead>
+
+
+		<tbody>
+			<tr v-bind:key="matter.id" v-for="matter in matters">
+				<td class="text-nowrap border">{{matter.fileRef}}</td>
+				<td class="text-nowrap border">{{matter.description}}</td>
+				<td class="text-nowrap border text-right">{{matter.statementBalance}}</td>
+			</tr>
+		</tbody>
+
+		<tfoot>
+			<tr>
+				<td class="no-border text-right font-weight-bold" colspan="2"><span v-if="statementBalance < 0">Balance</span><span v-else="">Amount Due</span></td>
+				<td class="border text-right font-weight-bold">{{statementBalance}}</td>
+			</tr>
+		</tfoot>
+	</table>
+
+
+</div>
+
+<div class="no-page-break">
+
+	<h4>Balances</h4>
+
+	<table class="table table-sm no-border">
+		<thead>
+			<tr class="bg-gray">
+				<th class="text-nowrap border text-right">Current</th>
+				<th class="text-nowrap border text-right">30 Days</th>
+				<th class="text-nowrap border text-right">60 Days</th>
+				<th class="text-nowrap border text-right">90 Days</th>
+				<th class="text-nowrap border text-right">120+ Days</th>
+				<th class="text-nowrap border text-right">Total</th>
+			</tr>
+		</thead>
+
+
+		<tbody>
+			<tr>
+				<td class="text-nowrap border text-right">{{party.current}}</td>
+				<td class="text-nowrap border text-right">{{party.days30}}</td>
+				<td class="text-nowrap border text-right">{{party.days60}}</td>
+				<td class="text-nowrap border text-right">{{party.days90}}</td>
+				<td class="text-nowrap border text-right">{{party.days120}}</td>
+				<td class="text-nowrap border text-right">{{party.balance}}</td>
+			</tr>
+		</tbody>
+
+	</table>
+
+
+</div>
+

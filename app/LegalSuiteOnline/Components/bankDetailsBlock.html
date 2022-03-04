@@ -1,0 +1,29 @@
+<div class="card w-75">
+    <div class="card-header font-weight-bold p-2">Our Banking Details</div>
+    <div class="card-body p-2">
+        <table class="table table-sm no-border">
+            <tbody>
+                <tr v-if="company.bankname">
+                    <td class="no-border font-weight-bold" style="width: 33%;">Bank:</td>
+                    <td class="no-border">{{company.bankname}}</td>
+                </tr>
+                <tr v-if="company.bankbranch">
+                    <td class="no-border font-weight-bold" style="width: 33%;">Branch:</td>
+                    <td class="no-border">{{company.bankbranch}}</td>
+                </tr>
+                <tr v-if="company.bankaccountname">
+                    <td class="no-border font-weight-bold" style="width: 33%;">Account Name:</td>
+                    <td class="no-border">{{company.bankaccountname}}</td>
+                </tr>
+                <tr v-if="company.bankaccounttype">
+                    <td class="no-border font-weight-bold" style="width: 33%;">Account Type:</td>
+                    <td class="no-border">{{company.bankaccounttype}}</td>
+                </tr>
+                <tr>
+                    <td class="no-border font-weight-bold" style="width: 33%;">Account Number:</td>
+                    <td class="no-border">{{company.bankaccountnumber}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

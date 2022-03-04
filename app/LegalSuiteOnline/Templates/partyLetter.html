@@ -1,0 +1,56 @@
+<component is="letterhead">[Letterhead]</component>
+
+<component is="partyName">[Party Name]</component>
+<component is="partyPostal">[Party Postal]</component>
+
+<component is="salutation">
+    [Salutation]
+</component>
+
+<p class="text-right">{{todaysDate}}</p>
+
+<h3><u>Letter Example</u></h3>
+<br/>
+<h4>Sub Title</h4>
+
+<p>Lorem Ipsum is dummy text used by the printing and typesetting industry. Lorem Ipsum has been the industry&#39;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+
+<div  v-if="party.totalMatters === 0">
+    <p>You currently have no Matters with us.</p>
+</div>
+<div v-else>
+<p>You have the following 
+    <span v-if="party.totalMatters > 1">{{party.totalMatters}} Matters</span>
+    <span v-else>Matter</span> with us:
+</p>
+<table class="table table-sm no-border">
+    <thead>
+        <tr class="bg-gray">
+            <th class="text-nowrap border">Matter</th>
+            <th class="text-nowrap border">Description</th>
+            <th class="text-nowrap border">Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-bind:key="matter.id" v-for="matter in party.matters">
+            <td class="text-nowrap border">{{matter.fileRef}}</td>
+            <td class="text-nowrap border">{{matter.description}}</td>
+            <td class="text-nowrap border">{{matter.matterTypeDescription}}</td>
+        </tr>
+        
+    </tbody>
+</table>
+</div>
+
+<div v-if="party.totalMatters === 0">
+    <p>We strive to offer excellent customer service at reasonable rates so please contact us if we can be of assistance to you.</p>
+</div>
+<div v-else>
+    <p>If you have any queries regarding
+        <span v-if="party.totalMatters > 1">these {{party.totalMatters}} Matters</span>
+        <span v-else> this Matter</span>
+    please don't hesitate to give us a call.
+
+    </p>
+</div>
+<component is="valediction">[Valediction]</component>

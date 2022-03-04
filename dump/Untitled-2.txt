@@ -1,0 +1,20 @@
+cd /home/forge/default
+git pull origin master
+$FORGE_COMPOSER install --no-interaction --prefer-dist --optimize-autoloader
+
+( flock -w 10 9 || exit 1
+    echo 'Restarting FPM...'; sudo -S service $FORGE_PHP_FPM reload ) 9>/tmp/fpmlock
+
+if [ -f artisan ]; then
+    $FORGE_PHP artisan migrate --force
+fi
+
+npm install
+
+
+php artisan config:cache
+php artisan view:clear
+php artisan route:clear
+composer dump-autoload
+
+npm run prod

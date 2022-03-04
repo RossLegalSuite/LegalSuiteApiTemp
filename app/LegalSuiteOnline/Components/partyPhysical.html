@@ -1,0 +1,8 @@
+<div v-if="party.physicalline1">{{party.physicalline1}}</div>
+<div v-if="party.physicalline1">{{party.physicalline2}}</div>
+<div v-if="party.physicalline3">{{party.physicalline3}} 
+    <span v-if="party.physicalcode"> {{party.physicalcode}}</span>
+</div>
+<div v-else>{{party.physicalcode}}</div>
+<div v-if="party.physicalprovince">{{party.physicalprovince}}</div>
+<div v-if="party.physicalcountry">{{party.physicalcountry}}</div>

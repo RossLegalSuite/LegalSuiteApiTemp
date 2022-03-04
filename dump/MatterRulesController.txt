@@ -1,0 +1,700 @@
+<?php
+
+namespace App\Custom;
+
+use DB;
+use App\Custom\ControllerHelper;
+use App\Custom\ModelHelper;
+
+use App\TableModels\Matter;
+use App\TableModels\Party;
+//use App\TableModels\Docgen; 
+use App\TableModels\Control;
+use App\TableModels\Employee;
+
+
+
+class MatterRulesController
+{
+
+    public function storeRecord($request) {
+        try {
+
+            if ( !isset($request['clientid']) ) {
+                $returnData['errors'] = "Please specify the Client for this Matter";
+                return $returnData;
+            }
+
+            // Check if updatedbyid was sent as part of the $request
+            if ( !isset($request['createdid']) ) {
+                $returnData['errors'] = "Createdid was not specified. This is required to get the Matter Defaults. Please set createdid to the RecordID of the logged in Employee.";
+                return $returnData;
+            }
+
+            //Convert the $request array into an object (for better syntax)
+            $matter = (object) $request;
+
+            $this->initializeData($matter, $request['createdid']);
+
+            if ( !isset($matter->description) ) {
+
+                logger('???? AFTER initializeData $matter->description',[$matter->description]);
+                
+            } else {
+                
+                logger('!!!!!!!!!!!! AFTER initializeData $matter->description',[$matter->description]);
+            }
+
+            $this->setMatterDefaults($matter, $request['createdid']);
+
+            $this->validateData($matter);
+
+            //***********************************************************
+            // Set the FileRef
+            //***********************************************************
+            $party = Party::select('MatterPrefix')->where('RecordID',$request['clientid'])->get();
+
+            if ( !$party ) {
+                $returnData['errors'] = "Could not find Client (" . $request['clientid'] . ") in the Party table. It is required to create the FileRef of the Matter.";
+                return $returnData;
+            }
+
+            $matterPrefix = $party[0]->MatterPrefix;
+
+            if ( !$matterPrefix ) {
+                $returnData['errors'] = "No MatterPrefix was retrieved from the Party table. It is required to create the FileRef of the Matter.";
+                return $returnData;
+            }
+
+            $control = Control::select('MatterPrefixOption')->first();
+
+            if ( !$control ) {
+                $returnData['errors'] = "Could not get the Control table. It is required to create the FileRef of the Matter.";
+                return $returnData;
+            }
+            
+            $matterPrefixOption = $control->MatterPrefixOption;
+
+            $this->setMatterFileRef($matter, $matterPrefix, $matterPrefixOption);
+
+            //***********************************************************
+            // Set the Archive Flags & set Access to Open
+            //***********************************************************
+            $matter->archivestatus = '0';
+            $matter->archiveflag = '0';
+            $matter->archiveno = '0';
+            $matter->access = 'O';
+
+            $this->sanitizeData($matter);
+
+            $returnData = Matter::create( (array) $matter);
+
+            return $returnData;
+
+        } catch(\Exception $e)  {
+
+            $returnData['errors'] = $e->getMessage();
+            return $returnData;
+        }
+
+    }
+
+    public function updateRecord($request) {
+
+        try {
+
+            //PROPSQL('INSERT EmployeeLogFile SELECT ' & TODAY() & ',' & CLOCK() & ',''' & StripSQL(MAT:Description) & ''',0,''Matter'',2,' & CEM:RecordID & ',' & MAT:RecordID & ',''' & MAT:FileRef & ''',''' & GlobalErrors.GetProcedureName() & '''','UpdateMatter')
+
+            $this->validateData($matter);
+
+            // Check if updatedbyid was sent as part of the $request
+            if ( !isset($request['updatedbyid']) ) {
+                $returnData['errors'] = "UpdatedById was not specified. This is required to record who updated the Matter. Please set updatedbyid to the RecordID of the logged in Employee.";
+                return $returnData;
+            }
+
+            //Convert the $request array into an object (for better syntax)
+            $matter = (object) $request;
+
+            $this->sanitizeData($matter);
+
+            // ***************************************************************************
+            // Check if they are consolidating the Matter with a proper consolidated Matter
+            // ***************************************************************************
+            if ( $matter->consolidatedflag !== '0' || $matter->consolidatedflag !== '4') {
+                $matter->consolidatedid = '0';
+            } 
+
+            $this->checkConsolidation($matter);
+
+            date_default_timezone_set('Africa/Johannesburg');
+            $matter->updatedbydate = ModelHelper::convertClarionDate( date("Y-m-d") );
+            $matter->updatedbytime = ModelHelper::convertClarionTime( date("H:i:s") );
+
+            // ***************************************************************************
+            // Save the ColData or BondData and ConveyData
+            // ***************************************************************************
+            $this->getDocgen($matter);
+
+            if ( $this->isCollectionsMatter($matter) ) {
+
+                logger('isCollectionsMatter');
+                $colDataExists = App\TableModels\ColData::where('MatterID',$matter->recordid)->exists();
+                logger('$colDataExists',[$colDataExists]);
+
+            } else {
+                logger('This is NOT a CollectionsMatter');
+            }
+
+            if ( $this->isConveyancingMatter($matter) ) {
+
+                logger('isConveyancingMatter');
+
+                $bondDataExists = App\TableModels\BondData::where('MatterID',$matter->recordid)->exists();
+                $conveyDataExists = App\TableModels\ConveyData::where('MatterID',$matter->recordid)->exists();
+
+            } else {
+                logger('This is NOT a ConveyancingMatter');
+            }
+
+
+            // Save the Record
+            $returnData = Matter::findOrFail($matter->recordid);
+            unset($matter->recordid);
+            $returnData->update( (array) $matter);
+
+            return $returnData;
+
+        } catch(\Exception $e)  {
+
+            $returnData['errors'] = $e->getMessage();
+            return $returnData;
+        }
+
+    }
+
+    private function initializeData(&$matter, $employeeId) {
+
+        try {
+
+            $control = Control::select(['defaultlanguageid','businessbankid','trustbankid'])->first();
+            if ( !$control ) throw new \Exception("Could not get the Control table. It is required to initialize the Matter record.");
+
+            $employee = Employee::select(['branchid','feeestimatewarningflag'])->where('RecordID',$employeeId)->first();
+            if ( !$employee ) throw new \Exception("Could not get the Branch ID from the Employee table. It is required to initialize the Matter record.");
+
+            if ( !isset($matter->dateinstructed) ) $matter->dateinstructed = ModelHelper::convertClarionDate( date("Y-m-d") );
+
+            if ( !isset($matter->description) ) $matter->description = 'New Matter';
+
+            $matter->employeeid = $employeeId;
+
+            // Prime new record - the client app can just send the clientid and employeeid!!
+            // Get the last Matter this Employee add
+            // or the last Matter Added for this client (as a default)
+            // Because the ClientFeeSheet depends on the Matter Type
+
+            $lastMatterAdded = Matter::select(['mattertypeid','clientfeesheetid','debtorfeesheetid','documentlanguageid','accountslanguageid','stagegroupid','costcentreid','docgenid','todogroupid','defaultbillingrateid'])
+            ->whereRaw('mattertypeid is not null and (Matter.employeeid = ' . $employeeId . ' or Matter.clientid = ' . $matter->clientid . ')')
+            ->orderBy('Matter.RecordID','desc')->first();
+
+            if ( !$lastMatterAdded ) {
+
+                $lastMatterAdded = Matter::select(['mattertypeid','clientfeesheetid','debtorfeesheetid','documentlanguageid','accountslanguageid','stagegroupid','costcentreid','docgenid','todogroupid','defaultbillingrateid'])
+                ->orderBy('Matter.RecordID','desc')->first();
+
+            }
+
+            if ( $lastMatterAdded ) {
+
+                if ( !isset($matter->mattertypeid) ) $matter->mattertypeid = $lastMatterAdded->mattertypeid;
+                if ( !isset($matter->clientfeesheetid) ) $matter->clientfeesheetid = $lastMatterAdded->clientfeesheetid;
+                if ( !isset($matter->debtorfeesheetid) ) $matter->debtorfeesheetid = $lastMatterAdded->debtorfeesheetid;
+                if ( !isset($matter->documentlanguageid) ) $matter->documentlanguageid = $lastMatterAdded->documentlanguageid;
+                if ( !isset($matter->accountslanguageid) ) $matter->accountslanguageid = $lastMatterAdded->accountslanguageid;
+                if ( !isset($matter->stagegroupid) ) $matter->stagegroupid = $lastMatterAdded->stagegroupid;
+                if ( !isset($matter->costcentreid) ) $matter->costcentreid = $lastMatterAdded->costcentreid;
+                if ( !isset($matter->docgenid) ) $matter->docgenid = $lastMatterAdded->docgenid;
+                if ( !isset($matter->todogroupid) ) $matter->todogroupid = $lastMatterAdded->todogroupid;
+                if ( !isset($matter->defaultbillingrateid) ) $matter->defaultbillingrateid = $lastMatterAdded->defaultbillingrateid;
+                if ( !isset($matter->businessbankid) ) $matter->businessbankid = $lastMatterAdded->businessbankid;
+                if ( !isset($matter->trustbankid) ) $matter->trustbankid = $lastMatterAdded->trustbankid;
+                if ( !isset($matter->branchid) ) $matter->branchid = $lastMatterAdded->branchid;
+                if ( !isset($matter->feeestimatewarningflag) ) $matter->feeestimatewarningflag = $lastMatterAdded->feeestimatewarningflag;
+
+            }
+
+            //Override these if set in the Control table
+            if ( !isset($matter->businessbankid) ) $matter->businessbankid = $control->businessbankid;
+            if ( !isset($matter->trustbankid) ) $matter->trustbankid = $control->trustbankid;
+
+            if ( !isset($matter->documentlanguageid) ) $matter->documentlanguageid = $control->defaultlanguageid;
+            if ( !isset($matter->accountslanguageid) ) $matter->accountslanguageid = $control->defaultlanguageid;
+
+            //Override these if set in the Employee table
+            if ( !isset($matter->branchid) ) $matter->branchid = $employee->branchid;
+            if ( !isset($matter->feeestimatewarningflag) ) $matter->feeestimatewarningflag = $employee->feeestimatewarningflag;
+
+            $matter->branchflag = isset($matter->branchid) ? 1 : 0;
+
+        } catch(\Exception $e)  {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+
+    private function setMatterDefaults(&$matter, $employeeId) {
+
+        $matDefs = \App\TableModels\MatDef::whereRaw("matdef.employeeid = " . $employeeId . " AND ( matdef.clientid = " . $matter->clientid . " OR matdef.clientid = 0)")->orderBy('ClientId','desc')->first();
+
+        if ( $matDefs ) {
+
+            if ( isset($matDefs->docgenid) ) $matter->docgenid = $matDefs->docgenid;
+            if ( isset($matDefs->mattertypeid) ) $matter->mattertypeid = $matDefs->mattertypeid;
+            if ( isset($matDefs->documentlanguageid) ) $matter->documentlanguageid = $matDefs->documentlanguageid;
+            if ( isset($matDefs->employeeid) ) $matter->employeeid = $matDefs->employeeid;
+            if ( isset($matDefs->extrascreenid) ) $matter->extrascreenid = $matDefs->extrascreenid;
+            if ( isset($matDefs->bankid) ) $matter->bankid = $matDefs->bankid;
+            if ( isset($matDefs->filecabinet) ) $matter->filecabinet = $matDefs->filecabinet;
+            if ( isset($matDefs->discount) ) $matter->discount = $matDefs->discount;
+            if ( isset($matDefs->prescriptiondate) ) $matter->prescriptiondate = $matDefs->prescriptiondate;
+            if ( isset($matDefs->casenumber) ) $matter->casenumber = $matDefs->casenumber;
+            if ( isset($matDefs->access) ) $matter->access = $matDefs->access;
+            if ( isset($matDefs->theirref) ) $matter->theirref = $matDefs->theirref;
+            if ( isset($matDefs->contact) ) $matter->contact = $matDefs->contact;
+            if ( isset($matDefs->salutation) ) $matter->salutation = $matDefs->salutation;
+            if ( isset($matDefs->oldref) ) $matter->oldref = $matDefs->oldref;
+            if ( isset($matDefs->internalcomment) ) $matter->internalcomment = $matDefs->internalcomment;
+            if ( isset($matDefs->accountcomment) ) $matter->accountcomment = $matDefs->accountcomment;
+            if ( isset($matDefs->clientfeesheetid) ) $matter->clientfeesheetid = $matDefs->clientfeesheetid;
+            if ( isset($matDefs->accountslanguageid) ) $matter->accountslanguageid = $matDefs->accountslanguageid;
+            if ( isset($matDefs->feeestimate) ) $matter->feeestimate = $matDefs->feeestimate;
+            if ( isset($matDefs->feenotesonhold) ) $matter->feenotesonhold = $matDefs->feenotesonhold;
+            if ( isset($matDefs->interestrate) ) $matter->interestrate = $matDefs->interestrate;
+            if ( isset($matDefs->scheduleid) ) $matter->scheduleid = $matDefs->scheduleid;
+            if ( isset($matDefs->agentflag) ) $matter->agentflag = $matDefs->agentflag;
+            if ( isset($matDefs->adminfeeflag) ) $matter->adminfeeflag = $matDefs->adminfeeflag;
+            if ( isset($matDefs->interestflag) ) $matter->interestflag = $matDefs->interestflag;
+            if ( isset($matDefs->vatexemptflag) ) $matter->vatexemptflag = $matDefs->vatexemptflag;
+            if ( isset($matDefs->discountsurcharge) ) $matter->discountsurcharge = $matDefs->discountsurcharge;
+            if ( isset($matDefs->receiptoption) ) $matter->receiptoption = $matDefs->receiptoption;
+            if ( isset($matDefs->consolidateid) ) $matter->consolidateid = $matDefs->consolidateid;
+            if ( isset($matDefs->consolidatedflag) ) $matter->consolidatedflag = $matDefs->consolidatedflag;
+            if ( isset($matDefs->invoiceflag) ) $matter->invoiceflag = $matDefs->invoiceflag;
+            if ( isset($matDefs->invoiceoption) ) $matter->invoiceoption = $matDefs->invoiceoption;
+            if ( isset($matDefs->invoiceformat) ) $matter->invoiceformat = $matDefs->invoiceformat;
+            if ( isset($matDefs->costcentreid) ) $matter->costcentreid = $matDefs->costcentreid;
+            if ( isset($matDefs->overrideincomeaccflag) ) $matter->overrideincomeaccflag = $matDefs->overrideincomeaccflag;
+            if ( isset($matDefs->incomeaccid) ) $matter->incomeaccid = $matDefs->incomeaccid;
+            if ( isset($matDefs->trustbankid) ) $matter->trustbankid = $matDefs->trustbankid;
+            if ( isset($matDefs->movementflag) ) $matter->movementflag = $matDefs->movementflag;
+            if ( isset($matDefs->collcommflag) ) $matter->collcommflag = $matDefs->collcommflag;
+            if ( isset($matDefs->collcommoption) ) $matter->collcommoption = $matDefs->collcommoption;
+            if ( isset($matDefs->collcommpercent) ) $matter->collcommpercent = $matDefs->collcommpercent;
+            if ( isset($matDefs->collcommlimit) ) $matter->collcommlimit = $matDefs->collcommlimit;
+            if ( isset($matDefs->todogroupid) ) $matter->todogroupid = $matDefs->todogroupid;
+            if ( isset($matDefs->businessbankid) ) $matter->businessbankid = $matDefs->businessbankid;
+            if ( isset($matDefs->branchflag) ) $matter->branchflag = $matDefs->branchflag;
+            if ( isset($matDefs->branchid) ) $matter->branchid = $matDefs->branchid;
+            if ( isset($matDefs->consolidatedisbursementsflag) ) $matter->consolidatedisbursementsflag = $matDefs->consolidatedisbursementsflag;
+            if ( isset($matDefs->investmentfeeflag) ) $matter->investmentfeeflag = $matDefs->investmentfeeflag;
+            if ( isset($matDefs->debtorfeesheetid) ) $matter->debtorfeesheetid = $matDefs->debtorfeesheetid;
+            if ( isset($matDefs->debtorcollcommoption) ) $matter->debtorcollcommoption = $matDefs->debtorcollcommoption;
+            if ( isset($matDefs->debtorcollcommpercent) ) $matter->debtorcollcommpercent = $matDefs->debtorcollcommpercent;
+            if ( isset($matDefs->debtorcollcommlimit) ) $matter->debtorcollcommlimit = $matDefs->debtorcollcommlimit;
+            if ( isset($matDefs->matgroup) ) $matter->matgroup = $matDefs->matgroup;
+            if ( isset($matDefs->receiptpercenttocosts) ) $matter->receiptpercenttocosts = $matDefs->receiptpercenttocosts;
+            if ( isset($matDefs->agreedfeepercent) ) $matter->agreedfeepercent = $matDefs->agreedfeepercent;
+            if ( isset($matDefs->payattorneyfirstamount) ) $matter->payattorneyfirstamount = $matDefs->payattorneyfirstamount;
+            if ( isset($matDefs->coldebitfeecodeid) ) $matter->coldebitfeecodeid = $matDefs->coldebitfeecodeid;
+            if ( isset($matDefs->defaultbillingrateid) ) $matter->defaultbillingrateid = $matDefs->defaultbillingrateid;
+            if ( isset($matDefs->stagegroupid) ) $matter->stagegroupid = $matDefs->stagegroupid;
+            if ( isset($matDefs->casetype) ) $matter->casetype = $matDefs->casetype;
+            if ( isset($matDefs->actingfor) ) $matter->actingfor = $matDefs->actingfor;
+            if ( isset($matDefs->courtflag) ) $matter->courtflag = $matDefs->courtflag;
+            if ( isset($matDefs->defended) ) $matter->defended = $matDefs->defended;
+            if ( isset($matDefs->attorneyclientflag) ) $matter->attorneyclientflag = $matDefs->attorneyclientflag;
+            if ( isset($matDefs->courtdate) ) $matter->courtdate = $matDefs->courtdate;
+            if ( isset($matDefs->invoicebfwdoption) ) $matter->invoicebfwdoption = $matDefs->invoicebfwdoption;
+            if ( isset($matDefs->invoicefeeoption) ) $matter->invoicefeeoption = $matDefs->invoicefeeoption;
+            if ( isset($matDefs->invoicedisbursementoption) ) $matter->invoicedisbursementoption = $matDefs->invoicedisbursementoption;
+            if ( isset($matDefs->receiptamount) ) $matter->receiptamount = $matDefs->receiptamount;
+            if ( isset($matDefs->commentoption) ) $matter->commentoption = $matDefs->commentoption;
+            if ( isset($matDefs->bondcauseid) ) $matter->bondcauseid = $matDefs->bondcauseid;
+            if ( isset($matDefs->matteremployeeid) ) $matter->matteremployeeid = $matDefs->matteremployeeid;
+            if ( isset($matDefs->internalcommentoption) ) $matter->internalcommentoption = $matDefs->internalcommentoption;
+            if ( isset($matDefs->agreedfeelimit) ) $matter->agreedfeelimit = $matDefs->agreedfeelimit;
+            if ( isset($matDefs->excludeunitsonaccountflag) ) $matter->excludeunitsonaccountflag = $matDefs->excludeunitsonaccountflag;
+            if ( isset($matDefs->receiptpercent) ) $matter->receiptpercent = $matDefs->receiptpercent;
+            if ( isset($matDefs->showprescriptionwarningflag) ) $matter->showprescriptionwarningflag = $matDefs->showprescriptionwarningflag;
+        }
+
+    }
+
+    private function validateData($matter) {
+
+        if ( !isset($matter->clientid) ) {
+            throw new \Exception("Please specify the Client for this Matter");
+        }
+        
+        if ( !isset($matter->description) ) {
+            throw new \Exception("Please give the Matter a description.");
+        }
+
+        if ( !isset($matter->clientfeesheetid) ) {
+            throw new \Exception("Please specify the Client Fee Sheet this Matter uses.");
+        }
+
+        if ( !isset($matter->mattertypeid) ) {
+            throw new \Exception("Please specify the Matter Type for this Matter.");
+        }
+
+        if ( !isset($matter->docgenid) ) {
+            throw new \Exception("Please specify the Document Set for this Matter.");
+        }
+
+
+    }
+
+    private function sanitizeData(&$matter) {
+
+        try {
+
+            // ******************************************
+            // Convert dates
+            // ******************************************
+
+            if ( isset($matter->dateinstructed) ) $matter->dateinstructed = ModelHelper::convertClarionDate($matter->dateinstructed);
+            if ( isset($matter->archivedate) ) $matter->archivedate = ModelHelper::convertClarionDate($matter->archivedate);
+            if ( isset($matter->courtdate) ) $matter->courtdate = ModelHelper::convertClarionDate($matter->courtdate);
+            if ( isset($matter->importantdate) ) $matter->importantdate = ModelHelper::convertClarionDate($matter->importantdate);
+            if ( isset($matter->interestfrom) ) $matter->interestfrom = ModelHelper::convertClarionDate($matter->interestfrom);
+            if ( isset($matter->prescriptiondate) ) $matter->prescriptiondate = ModelHelper::convertClarionDate($matter->prescriptiondate);
+
+            // ******************************************
+            // Check Fields
+            // ******************************************
+
+            if ( $matter->branchid == 0) $matter->branchflag = 0;
+
+            $matter->branchflag = $matter->branchid ? 1 : 0;
+
+            if ( !isset($matter->agreedfeeflag) || $matter->agreedfeeflag == 0){
+                $matter->agreedfeepercent = 0;
+                $matter->agreedfeelimit = 0;
+            }
+
+            if (!isset($matter->receiptpercent)) $matter->receiptpercent = '0.00';
+            if (!isset($matter->receiptamount)) $matter->receiptamount = '0.00';
+            if (!isset($matter->claimamount)) $matter->claimamount = '0.00';
+            if (!isset($matter->agreedfeepercent)) $matter->agreedfeepercent = '0.00';
+            if (!isset($matter->agentpercent)) $matter->agentpercent = '0.00';
+
+            if (!isset($matter->debtorpaymentfrequency)) $matter->debtorpaymentfrequency = '1';
+
+            if ( $matter->archiveflag ) {
+                if ( $matter->archivestatus != 2 ) $matter->archivestatus = 2;
+            } else {
+                if ( $matter->archivestatus > 1 ) $matter->archivestatus = 0;
+            }
+
+
+            if ( $matter->collcommoption == 'U' || $matter->debtorcollcommoption == 'U' ) {
+
+                $control = Control::select(['collcommpercent','collcommlimit'])->first();
+                if ( !$control ) throw new \Exception("Could not get the Control table. It is required to check the Matter data.");
+
+                
+                if ( $matter->collcommoption == 'U' ) {
+                    $matter->collcommpercent = $control->collcommpercent;
+                    $matter->collcommlimit   = $control->collcommlimit;
+                }
+
+                if ( $matter->debtorcollcommoption == 'U' ) {
+                    $matter->debtorcollcommpercent = $control->collcommpercent;
+                    $matter->debtorcollcommlimit   = $control->collcommlimit;
+                }
+
+            }
+
+
+            /*
+
+            CheckFields     Routine
+
+
+                !If LOC:DocGenType = 'LIT' and ~MAT:DebtorFeeSheetID Then Do GetMagCourtFeeSheet.
+
+                IF ~MAT:InterestRate
+                    CLEAR(CDE:Record)
+                    CDE:EmployeeID = GLO:EmployeeID
+                    CDE:LanguageID = MAT:DocumentLanguageID
+                    IF ~Access:ColDef.TryFetch(CDE:PrimaryKey)
+                        MAT:InterestRate = CDE:InterestRate
+                    END
+                END
+
+
+
+
+            MAT:LastDistributionNo = LOC:NextDistributionNo - 1
+            If MAT:LastDistributionNo < 0 Then MAT:LastDistributionNo = 0.
+            If ~LOC:InvoicePartyFlag Then MAT:InvoicePartyId = 0.
+
+            CheckLastAchiveNo      Routine
+            If SAV:ArchiveNo = MAT:ArchiveNo Then Exit.
+            If CTL:LastArchiveId = 0 Then Exit.
+            If MAT:ArchiveNo <= 0 Then Exit.
+            RowCounter{PROP:SQL} = 'select recordid, FileRef from matter where archiveno = ' & MAT:ArchiveNo
+            Next(RowCounter)
+            If ROW:Counter and ROW:Counter <> MAT:RecordId
+                Message('This number has already been used by another matter|FileRef: ' & ROW:Description & 'Setting archive number to next available number',ICON:Asterisk)
+                MAT:ArchiveNo = GetNextArchiveNo()
+            .
+            SetInvoiceOption        Routine
+            If LOC:FeeOption = 2
+                MAT:InvoiceFeeOption = 6
+            ElsIf LOC:FeeOption = 1 and LOC:FeeSeparatorOption = 0 and LOC:FeeSummarizeFlag = 0
+                MAT:InvoiceFeeOption = 1
+            ElsIf LOC:FeeOption = 1 and LOC:FeeSeparatorOption = 1 and LOC:FeeSummarizeFlag = 0
+                MAT:InvoiceFeeOption = 2
+            ElsIf LOC:FeeOption = 1 and LOC:FeeSeparatorOption = 0 and LOC:FeeSummarizeFlag = 1
+                MAT:InvoiceFeeOption = 3
+            ElsIf LOC:FeeOption = 1 and LOC:FeeSeparatorOption = 1 and LOC:FeeSummarizeFlag = 1
+                MAT:InvoiceFeeOption = 4
+            ElsIf LOC:FeeOption = 0 and LOC:FeeSummarizeFlag = 1
+                MAT:InvoiceFeeOption = 5
+            Else
+                MAT:InvoiceFeeOption = 0
+            .
+            If LOC:DisbursementOption = 2 ! Total Business and Creditor Disbursements
+
+                IF LOC:SeparateCreditorDisbursementOption
+                    MAT:InvoiceDisbursementOption = 11
+                ELSE
+                    MAT:InvoiceDisbursementOption = 6
+                END
+
+            ELSIF LOC:DisbursementOption = 3 ! Total Business but itmeise Creditor Disbursements
+
+                    MAT:InvoiceDisbursementOption = 12
+
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 0 and LOC:DisbursementSummarizeFlag = 0 and LOC:ItemiseCreditorDisbursementOption = 0
+                MAT:InvoiceDisbursementOption = 1
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 1 and LOC:DisbursementSummarizeFlag = 0 and LOC:ItemiseCreditorDisbursementOption = 0
+                MAT:InvoiceDisbursementOption = 2
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 0 and LOC:DisbursementSummarizeFlag = 1 and LOC:ItemiseCreditorDisbursementOption = 0
+                MAT:InvoiceDisbursementOption = 3
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 1 and LOC:DisbursementSummarizeFlag = 1 and LOC:ItemiseCreditorDisbursementOption = 0
+                MAT:InvoiceDisbursementOption = 4
+            ElsIf LOC:DisbursementOption = 0 and LOC:DisbursementSummarizeFlag = 1
+                MAT:InvoiceDisbursementOption = 5
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 0 and LOC:DisbursementSummarizeFlag = 0 and LOC:ItemiseCreditorDisbursementOption = 1
+                MAT:InvoiceDisbursementOption = 7
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 1 and LOC:DisbursementSummarizeFlag = 0 and LOC:ItemiseCreditorDisbursementOption = 1
+                MAT:InvoiceDisbursementOption = 8
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 0 and LOC:DisbursementSummarizeFlag = 1 and LOC:ItemiseCreditorDisbursementOption = 1
+                MAT:InvoiceDisbursementOption = 9
+            ElsIf LOC:DisbursementOption = 1 and LOC:DisbursementSeparatorOption = 1 and LOC:DisbursementSummarizeFlag = 1 and LOC:ItemiseCreditorDisbursementOption = 1
+                MAT:InvoiceDisbursementOption = 10
+            Else
+                MAT:InvoiceDisbursementOption = 0
+            .
+
+
+
+            */
+
+        } catch(\Exception $e)  {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+    private function addMatterParties($matter) {
+
+        /*
+
+            // Add the Client MatParty
+            // MP:Sorter = 1
+            //     MP:MatterID = MAT:RecordID
+            //     MP:RoleID = CTL:ClientRoleID
+            //     MP:PartyID = MAT:ClientID
+
+            //     MP:ContactID = GetDefaultContact(MP:PartyID)
+            //     MP:LanguageID = GetDefaultPartyLanguage(MP:PartyID)
+
+            //     MP:Reference = MAT:TheirRef
+            //     MP:MatterDescription = MAT:Description
+            //     Access:MatParty.TryInsert
+
+
+
+            if ( this.isConveyancingMatter() ) {
+
+                //CREATE CONVEYDATA AND BONDDATA
+
+            }
+            if ( this.isTransfersMatter() ) {
+                //ADD THE SELLER
+            }
+
+            if ( this.isBondMatter() ) {
+                //ADD THE MORTGAGOR
+            }
+            if ( this.isCollectionsMatter() ) {
+
+                console.log("isCollectionsMatter - TO DO: create colData record");
+
+            //************ ADD THE PLAINTIFF 
+            // MP:MatterID = MAT:RecordID
+            // IF COL:ActingFor = 'D' THEN MP:RoleID = CTL:DefendantRoleID ELSE MP:RoleID = CTL:PlaintiffRoleID.
+            // MP:Sorter = 1
+            // IF Access:MatParty.TryFetch(MP:MatterRoleKey)     ! THERE IS NO PLAINTIFF IN THE LIST OF MATTER PARTIES
+            //     MP:MatterID = MAT:RecordID
+            //     IF COL:ActingFor = 'D' THEN MP:RoleID = CTL:DefendantRoleID ELSE MP:RoleID = CTL:PlaintiffRoleID.
+            //     MP:PartyID = MAT:ClientID
+            //     MP:Reference = MAT:TheirRef
+            //     MP:MatterDescription = MAT:Description
+            //     MP:LanguageID = GetDefaultPartyLanguage(MP:PartyID)
+
+
+        }
+
+        */
+
+    }
+
+
+    private function setMatterFileRef(&$matter, $matterPrefix, $matterPrefixOption) {
+
+        try {
+
+            $fileRefCounterStatement = 'SELECT ISNULL(max(Convert(Int,FileRef)),0) as counter from (';
+            $fileRefCounterStatement .= 'Select case when charindex(\'/\',fileref) > 1 Then ' ;
+            $fileRefCounterStatement .= 'SubString(case when charindex(\'-\',fileref,charindex(\'/\',fileref)) > 1 Then SubString(fileref,1,charindex(\'-\',fileref,charindex(\'/\',fileref))-1) Else FileRef end ' ;
+            $fileRefCounterStatement .= ',charindex(\'/\',fileref)+1,14) Else \'\' End FileRef ' ;
+            $fileRefCounterStatement .= 'from matter where fileref like \'';
+            $fileRefCounterStatement .= $matterPrefix;
+            $fileRefCounterStatement .= '/%\' and ' ;
+            $fileRefCounterStatement .= 'fileref not like \'';
+            $fileRefCounterStatement .= $matterPrefix ;
+            $fileRefCounterStatement .= '/99999%\' ) A ';
+            $fileRefCounterStatement .= 'where Isnumeric(FileRef) <> 0' ;
+
+            $query = DB::connection('sqlsrv')->select($fileRefCounterStatement);
+
+            $counter = (int) $query[0]->counter;
+
+            $counter++;
+
+            if ( (int) $matterPrefixOption >= 1 ) {
+
+                if ( $counter < 100000 ) {
+
+                    //https://www.delftstack.com/howto/php/how-to-properly-format-a-number-with-leading-zeros-in-php/
+                    $matter->fileref = $matterPrefix . '/' . substr(str_repeat(0, 5).$counter, -5);
+
+                } else {
+
+                    $matter->fileref = $matterPrefix . '/' . $counter;
+                }
+
+            } else {
+
+                if ( $counter < 10000 ) {
+
+                    $matter->fileref = $matterPrefix . '/' . substr(str_repeat(0, 4).$counter, -4);
+
+                } else {
+
+                    $matter->fileref = $matterPrefix . '/' . $counter;
+                }
+
+            }
+
+        } catch(\Exception $e)  {
+            throw new \Exception($e->getMessage());
+        }
+
+
+    }
+
+    private function checkConsolidation($matter) {
+
+        try {
+            
+            $returnError = '';
+            
+            if ( $matter->consolidateid ) {
+                
+                $consolidatedMatter = Matter::select(['FileRef','ConsolidateId','ConsolidatedFlag'])->where('RecordId',$matter->consolidateid)->first();
+
+                if ( $consolidatedMatter ) {
+
+                    if ( $consolidatedMatter->ConsolidateId ) {
+
+                        $returnError = 'You cannot consolidate a Matter that is consolidated to another Matter';
+                        
+                    } else if ( $consolidatedMatter->ConsolidatedFlag !== "4" ) {
+
+                        $returnError = 'You cannot consolidate this Matter with ' . $consolidatedMatter->FileRef . '. It is not a "Consolidated Account"';
+
+                    }
+
+                }
+
+            }
+
+            // For testing...
+            //$returnError = '<p>Testing throw error.</p><p>You cannot consolidate this Matter.</p>';
+
+            if ( $returnError ) throw new \Exception($returnError);
+
+        } catch(\Exception $e)  {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+    private function getDocgen(&$matter) {
+        
+        // ##ROSS Docgen class not auto loaded -fix: Either Docgen OR DocGen!!!!!!!!!!!!!!!!
+        try {
+
+            $docgen = \App\TableModels\DocGen::select(['type','code','description'])->where('RecordID',$matter->docgenid)->firstOrFail();
+
+            $matter->docgentype = $docgen->type;
+            $matter->docgencode = $docgen->code;
+            $matter->docgendescription = $docgen->description;
+
+        } catch(\Exception $e)  {
+            throw new \Exception($e->getMessage());
+        }
+
+
+    }
+
+    private function isCollectionsMatter($matter) {
+
+        return $matter->docgentype == 'LIT' && $matter->docgencode != 'AMO' ? true : false;
+    }
+
+    private function isBondMatter($matter) {
+
+        return $matter->docgentype == 'BON' ? true : false;
+    }
+
+    private function isTransfersMatter($matter) {
+
+        return $matter->docgentype == 'TRN' ? true : false;
+    }
+
+    private function isConveyancingMatter($matter) {
+
+        return $matter->docgentype == 'BON' || $matter->docgentype == 'TRN' ? true : false;
+    }
+
+}
+

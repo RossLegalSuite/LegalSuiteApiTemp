@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>LegalSuite API Documentation</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS v5.0.2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link href="css/sidebar.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+</head>
+
+<body>
+
+
+    <main>
+
+        <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark col-md-2" >
+                <div class="fs-4 text-center pb-3">Contents</div>
+                
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="#introduction" class="nav-link active" aria-current="page">
+                            <i class="fa fa-toggle-right me-2"></i>Introduction
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#getting-started" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Getting Started
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#postman" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Postman
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tables" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Retrieving Data
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#view" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Creating a View
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#parameters" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Customizing Queries
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#selecting-columns" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Selecting Columns
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#where-clauses" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Where Clauses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#orderby-groupby" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Ordering & Grouping
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#register-developer" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Registering as a Developer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#register" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Registering a Client
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#database-structure" class="nav-link text-white">
+                            <i class="fa fa-toggle-right me-2"></i>Database Structure
+                        </a>
+                    </li>
+                </ul>
+            <!-- </div> -->
+        </div>
+
+        <!-- <div class="b-example-divider">
+        </div> -->
+    
+        <div class="px-5 py-3 col-md-10" style="overflow-y: auto;">
+
+            <div class="p-5 mb-4 bg-light border rounded-3">
+                <h1>
+                    <img src="favicon.png" alt="LegalSuite" style="display: inline-block; width: 50px; margin-right: 5px;">
+                    LegalSuite API Documentation</h1>
+                <p class="lead">Connect to a LegalSuite database in a secure environment.</p> 
+            </div>
+
+            <div class="row" id="introduction">
+                <h2>Introduction</h2>
+                
+                <div class="col-md-12">
+                    <p>
+                        LegalSuite is a Windows-based program designed to assist Attorneys in
+                        managing their legal practices. It is written in Clarion and .Net and uses
+                        the MS SQL database to store the program’s data. It also provides an API to
+                        allow 3<sup>rd</sup> party programs to access the data. 
+                    </p>
+
+                    <p>This document serves to explain how to use the LegalSuite API to connect to a LegalSuite database and retrieve data and (optionally) save, update and delete data.</p>
+
+                </div>
+            </div>
+
+            <div class="row">            
+
+                <div class="col-md-5">
+
+                    <p>Calls are made to our API at <code>https://legalsuiteapi.co.za/ </code> using an API Key</p>
+                    <p>The API Key serves to not only authenticate the request but also to point the request at a specific LegalSuite Database.</p>
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <div><code>POST https://legalsuiteapi.co.za/matter/get/71017 </code> &nbsp;
+                        <div><code>Header: 'authorization'='Bearer API Key'</code> &nbsp;
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                            <div class="px-3">"recordid": "71017",</div>
+                            <div class="px-3">"fileref": "0001/0001",</div>
+                            <div class="px-3">"description": "Kelvin Test",</div>
+                            <div class="px-3">"clientid": "28787",</div>
+                            <div class="px-3">"docgenid": "5",</div>
+                            <div class="px-3">"mattertypeid": "5",</div>
+                            <div class="px-3">"documentlanguageid": "1",</div>
+                            <div class="px-3">"employeeid": "69",</div>
+                            <div class="px-3">...</div>
+                            <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+                        
+                    </div>
+
+                </div>
+                
+                <div class="col-md-7" style="display:block; margin:auto;">
+                    <p class="text-center"><img alt="" title="" src="images/API Diagram.png"  style="border:groove; width: 90%;" /></p>
+                </div>
+            </div>
+
+            <hr class="my-5" id="getting-started">
+
+            <div class="row">
+                <h2>Getting Started</h2>
+                <div class="col-md-12">
+                    <p>To use the LegalSuite API you will need to be <a href="#register-developer">registered as a Developer</a> and recieve a Developer Key. Please <a href="mailto:tech@legalsuite.co.za">contact us</a> to register as a Developer.</p>
+                    <p>This Developer Key is used by the API to identify the Developer. This must be sent in the first request with the LegalSuite Employee's LoginId and Password.</p>
+                    <p>The LegalSuite Employee's LoginId and Password are the same as those used to login to LegalSuite itself.</p>
+
+                </div>
+            </div>
+            
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <div><code>POST https://legalsuiteapi.co.za/auth</code> </div>
+                        <div><code>Header : 'authorization'='Developer Key'</code> </div>
+                        <div><code>Body : 'company'='ACME'</code> </div>
+                        <div><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'login'='Kobus'</code> </div>
+                        <div><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'password'='Password12345'</code> </div>
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div>    "apikey": "8jjh70XcSkzVvqOe1...",</div>
+                            <div>    "employee": {</div>
+                            <div>        "recordid": "1034",</div>
+                            <div>        "name": "Kobus",</div>
+                            <div>        "loginid": "Kobus Smith",</div>
+                            <div>        "email": "kobus@Attorney.co.za",</div>
+                            <div>        "suspendedflag": "0",</div>
+                            <div>        "supervisorflag": "1",</div>
+                            <div>        ...</div>
+                            <div>}</div>
+                        </code>
+                        
+                    </div>
+
+                </div>
+
+                <div class="col-md-7 mt-3">
+                    <p class="text-center"><img alt="" title="" src="images/API Key Example.png"  style="border:groove; width: 90%; " /></p>
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <p>If the login is successful, an API Key will be returned in the response.</p>
+                    <p>This API Key is then used in all subsequent queries to the API.</p>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <p><strong>Note: </strong>Not all LegalSuite clients allow access to their databases via the API.</p>
+                    <p>To enable access via the API, a LegalSuite client needs to register with the API and grant specific rights to each Developer.</p>
+                    <p>See <a href="#register">Registering a Client</a> below.</p>
+                </div>
+            </div>
+
+            <hr class="my-5" id="postman">
+
+            <div class="row" >
+                <h2>Postman</h2>
+                <div class="col-md-6">
+                    <p><a target="_blank" href="https://www.postman.com/">Postman</a> is a free to use 3rd Party application that can be used to build and Test API Queries.</p>
+                    <p>We have also built a library of all the API example queries in this documentation for easy access.</p>
+                    <p>Once you have <a target="_blank" href="https://www.postman.com/">Postman</a> set up, click the Run In Postman button below to add all these queries to the application.</p>
+                    <div class="mb-3 postman-run-button" data-postman-action="collection/import" data-postman-var-1="a18dc9bf3d8366148ae2"></div>
+                    <p><strong>Note: </strong>These queries are linked to a demo API key which only has read access test environment.</p>
+
+                </div>
+
+                <div class="col-md-6" style="display:block; margin:auto;">
+                    <p class="text-center"><img alt="" title="" src="images/Postman.jpg"  style="border:groove; width: 90%;" /></p>
+                </div>
+
+            </div>
+
+            <hr class="my-5" id="tables">
+
+            <div class="row">
+                
+                <div class="col-md-12">
+
+                    <h2>Retrieving Data</h2>
+                    
+                    <p>You can retrieve data from the LegalSuite Database by querying a Table or a View</p>
+
+                    <p>Tables queries provide full CRUD (Create, Read, Update and Delete) functionality, while views only offer read access.</p>
+
+                    <p>Although the LegalSuite API offers CRUD Functionality, some Developers are only granted Read Access - depending on the scope of their Application.</p>
+
+                </div>
+
+            </div>
+
+            <div class="row mt-2">
+
+                <div class="col-md-6">
+                    <div class="col-md-10">
+
+                        <h5>Retrieve All FileNotes</h5>
+                        <fieldset class="boxed">
+                            <legend>Example</legend>
+                            <code>
+                                <div>POST https://legalsuiteapi.co.za/filenote/get</div> 
+                                <div>Header: 'authorization'='Bearer API Key'</div> 
+                            </code> 
+            
+                        </fieldset>
+            
+                        <div class="boxed mt-3" style="background:lightgrey">
+                            <div>Response:</div>
+                            <code style="color: forestgreen">
+                                <div>{</div>
+                                <div class="px-1">"data": [{</div>
+                                    <div class="px-3">"recordid": "6615999",</div>
+                                    <div class="px-3">"matterid": "942",</div>
+                                    <div class="px-3">"docfilenoteid": "2",</div>
+                                    <div class="px-3">...</div>
+                                <div class="px-1"> },</div>
+                                <div class="px-1"> {,</div>
+                                    <div class="px-3">"recordid": "6616000",</div>
+                                    <div class="px-3">"matterid": "945",</div>
+                                    <div class="px-3">"docfilenoteid": "5",</div>
+                                    <div class="px-3">...</div>
+                                <div class="px-1"> }]</div>
+                                <div>}</div>
+                            </code>
+    
+                        </div>
+    
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+
+                <div class="col-md-6">
+
+                    <h5>Get a Single FileNote (with RecordID 610024)</h5>
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/filenote/get/610024</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                                <div class="px-1">"data": [{</div>
+                                    <div class="px-3">"recordid": "610024",</div>
+                                    <div class="px-3">"matterid": "145",</div>
+                                    <div class="px-3">"docfilenoteid": "1",</div>
+                                    <div class="px-3">...</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row mt-5">
+
+                <div class="col-md-6">
+
+                    <h5>Create a New FileNote</h5>
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/filenote/store</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                            <div>Body : 'matterid'='71017'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'employeeid'='1034'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'description'='FileNote Description'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '...'</div>
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"recordid": "621111",</div>
+                                <div class="px-3">"matterid": "71017",</div>
+                                <div class="px-3">"docfilenoteid": "0",</div>
+                                <div class="px-3">...</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row mt-5">
+
+                <div class="col-md-6">
+
+                    <h5>Update a FileNote (with the RecordID 621111)</h5>
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/filenote/update</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                            <div>Body : 'recordid'='621111'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'employeeid'='1011'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'docfilenoteid'='35'</div>
+                        </code> 
+
+                    </fieldset>
+
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"recordid": "621111",</div>
+                                <div class="px-3">"matterid": "71017",</div>
+                                <div class="px-3">"docfilenoteid": "35",</div>
+                                <div class="px-3">...</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                
+                    <div class="col-md-6">
+
+                        <h5>Delete a FileNote (with the RecordID 621111)</h5>
+                        <fieldset class="boxed">
+                            <legend>Example</legend>
+                            <code>
+                                <div>POST https://legalsuiteapi.co.za/filenote/delete</div> 
+                                <div>Header: 'authorization'='Bearer API Key'</div> 
+                                <div>Body : 'recordid'='621111'</div>
+                            </code> 
+            
+                        </fieldset>
+            
+                        <div class="boxed mt-3" style="background:lightgrey">
+                            <div>Response:</div>
+                            <code style="color: forestgreen">
+                                <div>{</div>
+                                <div class="px-1">"data": []</div>
+                                <div>}</div>
+                            </code>
+    
+                        </div>
+    
+                    </div>
+
+            </div>
+
+            <hr class="my-5" id="view">
+
+            <div class="row mt-5">
+                <div class="col-md-12">
+
+                    <h4>Creating SQL Views and retreiving data from Views</h4>
+
+                    <p>The API not only allows you to retrieve data from a View, but also you to create your own SQL Views</p>
+                    
+                    <p>This is done by including the view name and SQL Script in the body of the request to : <code>https://legalsuiteapi.co.za/createview</code></p>
+
+                    <p><strong>Note:</strong> If the view exist, it will be replaced therefore it is important to prefix your Application Name to any Views you create to ensure they do not clash with any existing Views and are also easily identifiable.</p>
+
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-6">
+
+                    <h5>Creating a View</h5>
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/createview</div>
+                            <div>Header: 'authorization'='Bearer API Key' </div>
+                            <div>Body : viewname:AppNameStageCodeListView</div>
+                            <div class="">SQL: SELECT</div>
+                            <div class="px-5">Stage.RecordID,</div>
+                            <div class="px-5">Stage.Description,</div>
+                            <div class="px-5">Stage.Code,</div>
+                            <div class="px-5">StageGroup.Description AS stagegroupdescription,</div>
+                            <div class="px-5">Stage.StageGroupID </div>
+                            <div class="px-5">FROM Stage </div>
+                            <div class="px-5">LEFT JOIN StageGroup ON </div>
+                            <div class="px-5">Stage.StageGroupID = StageGroup.RecordId</div>
+
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"success": [{</div>
+                                <div class="px-3">"You may access the view at legalsuiteapi.co.za/AppNameStageCodeListView/get"</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-6">
+
+                    <p>Once the view is successfully created the API will give you a response with the URL to retrieve data from this view.</p>
+                    <p>All of the customizing you are able to perform on normal tables you are also able to apply to SQL views.</p>
+
+                    <h5>Retrieving data from a View</h5>
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/appnamestagecodelistview/get</div>
+                            <div>Header: 'authorization'='Bearer API Key' </div>
+                            
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                                <div class="px-1">"data": [{</div>
+                                    <div class="px-3">{</div>
+                                    <div class="px-3">    "recordid": "1",</div>
+                                    <div class="px-3">    "description": "Letter of Demand",</div>
+                                    <div class="px-3">    "code": "0000",</div>
+                                    <div class="px-3">    "stagegroupdescription": "General Collections",</div>
+                                    <div class="px-3">    "stagegroupid": "1"</div>
+                                    <div class="px-3">},</div>
+                                    <div class="px-3">{</div>
+                                    <div class="px-3">    "recordid": "2",</div>
+                                    <div class="px-3">    "description": "Section 57 AOD & consent to Judgment",</div>
+                                    <div class="px-3">    "code": "0010",</div>
+                                    <div class="px-3">    "stagegroupdescription": "General Collections",</div>
+                                    <div class="px-3">    "stagegroupid": "1"</div>
+                                    <div class="px-3">},</div>
+                                    <div class="px-3">...</div>
+                                    <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5" id="parameters">
+
+            <div class="row" >
+                <h2>Customizing Queries</h2>
+                <div class="col-md-12">
+                    <p>API requests can be customized to add additional functionality.</p> 
+
+                    <p>The LegalSuite API comes with many useful Parameters. It contains a lot of native SQL syntax including WHERE clauses and table JOINs.</p>
+
+                    <p>It also allows you to set Paging parmeters to allowing you to retrieve smaller subsets of data to improve performance.</p>
+
+                </div>
+
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>start</td>
+                                <td>
+                                    The record position to start from must be used with the length
+                                    parameter Useful to add paging functionality to the result
+                                    set,
+                                </td>
+                                <td>
+                                    start=0
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>length</td>
+                                <td>
+                                    How many records to return must be used with the start
+                                    parameter
+                                </td>
+                                <td>
+                                    length=10
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>getSql</td>
+                                <td>Instead of a results set, returns the SQL Query.</td>
+                                <td>method:getSql</td>
+                            </tr>
+                            <tr>
+                                <td>Count</td>
+                                <td>Returns a Count of the result set.</td>
+                                <td>method:Count</td>
+                            </tr>
+                            
+                            
+                            
+                            
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/favourites/get</div> 
+                            <div>Header :'authorization'='Bearer API Key'</div> 
+                            <div>Body : 'addselect[]:Matter.FileRef'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'addselect[]:Employee.Name'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'leftjoin[]:Matter,Matter.RecordID,=,Favourites.MatterID'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'leftjoin[]:Employee,Employee.RecordID,=,Favourites.EmployeeID'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'method:getSql'</div>
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"select [Matter].[FileRef], </div>
+                                <div class="px-3">"[Employee].[Name], [Favourites].* </div>
+                                <div class="px-3">"from [Favourites] </div>
+                                <div class="px-3">"left join [Matter] on [Matter].[RecordID] </div>
+                                <div class="px-3">"= [favourites].[MatterID] </div>
+                                <div class="px-3">"left join [Employee] on [Employee].[RecordID] </div>
+                                <div class="px-3">"= [favourites].[EmployeeID]</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <hr class="my-5" id="selecting-columns">
+
+            <div class="row">
+                <h2>Selecting Columns</h2>
+                <div class="col-md-10">
+
+                    <p>The API returns a default set of columns when retrieving data from a table.</p>
+                    <p>These are often all that are required, but you can specify the columns returned by using select and addselect.</p>
+                    <p>If you want to add multiple Columns, you may send through an array of Select fields in the URL. EG select[]=matter.fileref, select[]=matter.description</p>
+                    <p>This will return the FileRef and Description records from the Matter Table, we recommend using the paging parameters that can be found under  <a href="#parameters">Customizing Queries</a>  to receive smaller result sets.</p>
+                    <p>This can be done on any of the select field types, an example of this can be found below.</p>
+
+                </div>
+                
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>select</td>
+                                <td>Select specific columns, e.g. fileRef and description - Send this in the body:</td>
+                                <td>
+                                    select[]=matter.fileRef
+                                    select[]=matter.description
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>addselect</td>
+                                <td>Add additional columns to the default columns - Send this in the body:</td>
+                                <td>
+                                    addselect=employee.name
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>selectraw</td>
+                                <td>
+                                    To be used when you want to use a function within a Select
+                                </td>
+                                <td>
+                                    selectraw=MAX(matter.RecordID)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/matter/get</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                            <div>Body: 'addselect:Matter.RecordId'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'selectraw:Matter.FileRef as MatterFileRef'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'select:Matter.Description</div>
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                            <div class="px-3">"recordid": "71017",</div>
+                            <div class="px-3">"matterfileref": "0001/0001",</div>
+                            <div class="px-3">"description": "Kelvin Test",</div>
+                            <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <hr class="my-5" id="where-clauses">
+
+            <div class="row">
+                <h2>Where Clauses</h2>
+                <div class="col-md-12">
+
+                    <p>SQL WHERE Clauses are a very powerful feature when using SQL. We are happy to tell you that the API offers this same powerful functionality.</p>
+                    <p>WHERE clauses help users filter down the result sets on all CRUD functionality.</p>
+                    <p>The format of any type of where clause will follow this pattern  <code>where=ColumnName,Operator,Value</code>.</p>
+                    <p>To send multiple where clauses in one query we can make use of the array feature, and example can be found below.</p>
+                    <p><strong>Hint: </strong>You can always use the Method:toSql to get back your constructed SQL query to check the WHERE clauses you have.</p>
+
+                </div>
+
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>where</td>
+                                <td>adds a sql where clause.</td>
+                                <td>
+                                    where[]=Matter.RecordID,=,17
+                                    where[]=Matter.Employee,=,17
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>orwhere</td>
+                                <td>adds a sql or Where clause.</td>
+                                <td>
+                                    orwhere=fileRef,like,1200
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>wherein</td>
+                                <td>adds a sql where In clause.</td>
+                                <td>
+                                    wherein=recordId,17,25,32
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>wherenull</td>
+                                <td>adds a sql or Where clause.</td>
+                                <td>
+                                    wherenull=matter.description
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>orwhere</td>
+                                <td>adds a sql orWhere clause.</td>
+                                <td>
+                                    orwhere=fileRef,like,1200
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>whereraw</td>
+                                <td>
+                                    To be used when you want to use a function within a where.
+                                </td>
+                                <td>
+                                    whereraw=MAX(Matter.RecordID)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/matter/get</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                            <div>Body: 'select:Matter.RecordId'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'select:Matter.FileRef'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'select:Matter.Description</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'where[]:Matter.EmployeeID,=,8'</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'where[]:Matter.FileRef,like,ACO1%'</div>
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"recordid": "61810",</div>
+                                <div class="px-3">"fileref": "ACO1/0003",</div>
+                                <div class="px-3">"description": "No Description"</div>
+                                <div class="px-1">},</div>
+                                <div class="px-1">{</div>
+                                <div class="px-3">"recordid": "61811",</div>
+                                <div class="px-3">"fileref": "ACO1/0004",</div>
+                                <div class="px-3">"description": "No Description"</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <hr class="my-5" id="orderby-groupby">
+
+            <div class="row">
+                <h2>Ordering and Grouping</h2>
+                <div class="col-md-6">
+
+                    <p>The API also allows you to ORDER BY or GROUP BY your result set.</p>
+                    <p>The ORDER BY is used to sort the result-set in ascending or descending order. The ORDER BY keyword sorts the records in ascending order by default. To sort the records in descending order, use the DESC keyword.</p>
+                    <p>GROUP BY is also supported by the API and can be used to arrange identical data into groups</p>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>orderby</td>
+                                <td>Provides a Sql OrderBy Functionality</td>
+                                <td>orderby=matter.fileRef,DESC</td>
+                            </tr>
+                            <tr>
+                                <td>orderbyraw</td>
+                                <td>Provides a Sql OrderBy when wanting to use a SQL Function</td>
+                                <td>orderbyraw=MAX(CustomTable.RecordID),DESC</td>
+                            </tr>
+                            <tr>
+                                <td>groupby</td>
+                                <td>Provides a Sql GroupBy Clause</td>
+                                <td>
+                                    groupby=Matter.DateInstructed
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/matter/get</div> 
+                            <div>Header: 'authorization'='Bearer API Key'</div> 
+                            <div>Body: 'orderby:Matter.FileRef,desc'</div>
+                        </code> 
+        
+                    </fieldset>
+        
+                    <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"fileref": "0001/0001",</div>
+                                <div class="px-3">"name": "Jennifer Daly",</div>
+                                <div class="px-3">"recordid": "74249",</div>
+                                <div class="px-3">"matterid": "71017",</div>
+                                <div class="px-3">"employeeid": "23",</div>
+                                <div class="px-3">"date": "80460",</div>
+                                <div class="px-3">"time": "4521774"</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <hr class="my-5" id="register-developer">
+
+            <div class="row">
+                <h2>Registering as a Developer</h2>
+                <div class="col-md-12">
+                
+                    <p>To register as a developer for the API you need to contact our admins at <a href="mailto:tech@LegalSuite.co.za">tech@LegalSuite.co.za</a></p>
+
+                    <p>Once successfully registered you will be given your Developer Key as well as login credentials.</p>
+                        
+                    <p>Proceed to the <a target="_blank" href=https://legalsuiteapi.co.za/login>Login Page</a> and login with your credentials.</p>
+
+                    <p>Your management page will display a list of clients who have given you access to there LegalSuite Database. By default, you will have access to LegalSuites Sandbox environment. This is displayed as one of the clients in the list.</p>
+
+                    <p>You also have access to the unique API Keys that are specific to each client, you can use these in Postman to test your Queries without having to go through the Login Controller.</p>
+
+                    <p>You are able to toggle between clients that have given you access, as well as all the clients that are registered on the LegalSuite API</p>
+
+                    <p><img alt="" title="" src="images/developerHome.png" style="width: 90%" /></p>   
+                    
+                </div>
+
+            </div>
+
+            <hr class="my-5" id="register">
+
+            <div class="row">
+                <h2>Registering a Client</h2>
+                <div class="col-md-12">
+
+                    <p>For a connection between a Clients SQL database and the LegalSuite API to be made a client has to register and add their SQL database details.</p>
+                    <p>The API makes this easy, below are examples of functions that can be used to check if a client is already registered to the API, one to test SQL Database connections and the last to register new clients to the API.</p>
+                    
+                        
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed mb-3 ">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/auth/checkregister</div> 
+                            <div>Header: 'authorization'='Developer Key'</div> 
+                            <div>Body: 'firmcode:ACME02'</div>
+                        </code> 
+        
+                    </fieldset>
+
+                    
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/auth/testconnection</div> 
+                            <div>Header: 'authorization'='Developer API Key'</div> 
+                            <div>Body: dbhost:legalsuite.org</div>
+                            <div class="px-5">dbport:1433</div>
+                            <div class="px-5">dbdatabase:legalsuite</div>
+                            <div class="px-5">dbuser:ls</div>
+                            <div class="px-5">dbpassword:password</div>
+
+                        </code> 
+        
+                    </fieldset>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <fieldset class="boxed">
+                        <legend>Example</legend>
+                        <code>
+                            <div>POST https://legalsuiteapi.co.za/auth/register</div> 
+                            <div>Header: 'authorization'='Developer API Key'</div> 
+                            <div>Body: name:Paul</div>
+                            <div class="px-5">email:paul@acme.co.za</div>
+                            <div class="px-5">password:12345</div>
+                            <div class="px-5">password_confirmation:12345</div>
+                            <div class="px-5">website:legalsuite.co.za</div>
+                            <div class="px-5">dbhost:legalsuite.org</div>
+                            <div class="px-5">dbport:1433</div>
+                            <div class="px-5">dbdatabase:legalsuite</div>
+                            <div class="px-5">dbuser:ls</div>
+                            <div class="px-5">dbpassword:password</div>
+
+                        </code> 
+        
+                    </fieldset>
+        
+                    <!-- <div class="boxed mt-3" style="background:lightgrey">
+                        <div>Response:</div>
+                        <code style="color: forestgreen">
+                            <div>{</div>
+                            <div class="px-1">"data": [{</div>
+                                <div class="px-3">"fileref": "0001/0001",</div>
+                                <div class="px-3">"name": "Jennifer Daly",</div>
+                                <div class="px-3">"recordid": "74249",</div>
+                                <div class="px-3">"matterid": "71017",</div>
+                                <div class="px-3">"employeeid": "23",</div>
+                                <div class="px-3">"date": "80460",</div>
+                                <div class="px-3">"time": "4521774"</div>
+                                <div class="px-1"> }]</div>
+                            <div>}</div>
+                        </code>
+
+                    </div> -->
+
+                </div>
+
+            </div>
+
+            <hr class="my-5" id="database-structure">
+
+
+            <div class="row">
+                <h2>Database Structure</h2>
+                <div class="col-md-9">
+
+                    <p>To gain a more indepth understanding of the LegalSuite Database Structure 
+                        you can find a document explaining the core relationships <a target="_blank" href="/databasestructure.html">here</a>
+                    </p>
+
+                    
+
+                </div>
+
+            </div>
+
+            <hr class="my-5">
+
+
+        </div>
+
+    </main>
+
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <script src=" " integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        (function (p,o,s,t,m,a,n) {
+            !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
+            !o.getElementById(s+t) && o.getElementsByTagName("head")[0].appendChild((
+            (n = o.createElement("script")),
+            (n.id = s+t), (n.async = 1), (n.src = m), n
+            ));
+        }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+    </script>
+
+    <script>
+        document.getElementById("sidebar").addEventListener("click", function(e) {
+            console.log('e',e);
+            var elems = document.querySelectorAll(".active");
+                [].forEach.call(elems, function(el) {
+                    el.classList.add("text-white");
+                    el.classList.remove("active");
+                });
+            e.target.className = "nav-link active";
+
+        });
+        (function () {
+            'use strict'
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        })()
+
+    </script>
+</body>
+
+</html>

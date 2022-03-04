@@ -1,0 +1,22 @@
+<table class="table table-sm no-border w-60">
+    <thead>
+        <tr class="bg-gray">
+            <th class="border">Cost</th>
+            <th class="border text-right">VAT</th>
+            <th class="border text-right">Amount</th>
+            <th class="border text-right">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-bind:key="coldebit.recordid" v-for="coldebit.in getDebtorTransactions(filterBy)">
+            <td class="border w-60">{{coldebit.description}}</td>
+            <td class="border text-right">{{formatMoney(coldebit.vatamount)}}</td>
+            <td class="border text-right">{{formatMoney(coldebit.amount)}}</td>
+            <td class="border text-right">{{formatMoney(coldebit.amount + coldebit.vatamount)}}</td>
+        </tr>
+        <tr class="font-weight-bold">
+            <td class="text-nowrap no-border text-right" colspan="3">Total Costs</td>
+            <td class="text-nowrap border text-right">{{formatMoney(totalDebtorTransactions(filterBy))}}</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+<component is="letterhead">[Letterhead]</component>
+
+<p>{{party.Name}}</p>
+<p>{{party.PostalAddress}}</p>
+<br>
+<component is="salutation">[Salutation]</component>
+
+<p class="text-right">{{todaysDate}}</p>
+<br>
+<h3><u>Letter of Demand</u></h3>
+<br>
+<p>We act for {{client.Name}} on behalf of this matter.</p>
+<p>We demand <span v-if="$root.isset(matParty.ClaimAmount)" v-text="$root.formatMoney(matParty.ClaimAmount)"></span><span v-else="" v-text="$root.formatMoney(matter.ClaimAmount)"></span> from you.</p> 
+<br>
+
+<component is="debtorsAccountTable" v-bind="{ filterBy: 'LOD' }">[debtorsAccountTable]</component>
+
+<component is="valediction">[valediction]</component>

@@ -1,0 +1,21 @@
+<span class="font-weight-bold">Our Banking Details: </span>
+<span v-if="company.bankname" class="mr-2">
+    <span>Bank: </span>
+    <span class="font-weight-bold">{{company.bankname}}</span>
+</span>
+<span v-if="company.bankbranch" class="mr-2">
+    <span>Branch: </span>
+    <span class="font-weight-bold">{{company.bankbranch}}</span>
+</span>
+<span v-if="company.bankaccountname" class="mr-2">
+    <span>Account Name: </span>
+    <span class="font-weight-bold">{{company.bankaccountname}}</span>
+</span>
+<span v-if="company.bankaccounttype" class="mr-2">
+    <span>Account Type: </span>
+    <span class="font-weight-bold">{{company.bankaccounttype}}</span>
+</span>
+<span v-if="company.bankaccountnumber">
+    <span>Account Number: </span>
+    <span class="font-weight-bold">{{company.bankaccountnumber}}</span>
+</span>

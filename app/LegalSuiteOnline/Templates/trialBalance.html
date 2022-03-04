@@ -1,0 +1,40 @@
+<h2 class="text-center">Trial Balance</h2>
+<h3 class="text-center">{{company.name}}</h3>
+<table class="table table-sm no-border w-100">
+	<tbody>
+		<tr>
+			<td class="no-border text-right"><strong>Date:</strong> {{todaysDate}}</td>
+		</tr>
+	</tbody>
+</table>
+
+<table class="table table-sm no-border w-100">
+	<thead>
+		<tr class="bg-gray">
+			<th class="text-nowrap border">Code</th>
+			<th class="text-nowrap border">Account</th>
+			<th class="text-nowrap border">Type</th>
+			<th class="text-nowrap border text-right">Debit</th>
+			<th class="text-nowrap border text-right">Credit</th>
+		</tr>
+	</thead>
+
+
+	<tbody>
+		<tr v-bind:key="account.id" v-for="account in accounts">
+			<td class="text-nowrap border">{{account.code}}</td>
+			<td class="text-nowrap border">{{account.description}}</td>
+			<td class="text-nowrap border">{{account.type}}</td>
+			<td class="text-nowrap border text-right">{{account.debits}}</td>
+			<td class="text-nowrap border text-right">{{account.credits}}</td>
+		</tr>
+	</tbody>
+
+	<tfoot>
+		<tr>
+			<td class="no-border text-right font-weight-bold" colspan="3">Totals</td>
+			<td class="border text-right font-weight-bold">{{accounts.debits}}</td>
+			<td class="border text-right font-weight-bold">{{accounts.credits}}</td>
+		</tr>
+	</tfoot>
+</table>

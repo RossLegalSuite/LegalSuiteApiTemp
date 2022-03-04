@@ -1,0 +1,56 @@
+*How to setup PHP Artisan Tinker to use Eloquent commands*
+
+*1) You need the thread-safe x64 sqlsrv driver for the PHP version that tinker uses*
+
+Find the php.ini and version used by Tinker by running "php --ini"
+
+PS C:\laragon\www\legalsuiteapi> php --ini
+Configuration File (php.ini) Path: C:\WINDOWS
+Loaded Configuration File:         C:\laragon\bin\php\php-7.2.19-Win32-VC15-x64\php.ini
+Scan for additional .ini files in: (none)
+Additional .ini files parsed:      (none)
+
+Note: Examples of php sqlsrv drivers are saved in the dump folder.
+
+Rename the appropriate one "php_pdo_sqlsrv.dll" 
+
+Save it in the *C:\laragon\bin\php\php-7.2.19-Win32-VC15-x64\ext* folder.
+
+1.3) Add this line to the php.ini
+
+extension=pdo_sqlsrv
+
+*2) You also need to have the ODBC 11 driver installed on your machine.*
+
+Download and install it from here:
+
+https://www.microsoft.com/en-us/download/details.aspx?id=36434
+
+*3) Ensure the Remote Server you are accessing allows SQL connections from your IP address*
+
+Add your IP address to the server's firewall
+
+*4) Run PHP Artisan Tinker*
+
+PS C:\laragon\www\legalsuiteapi>php artisan tinker
+
+*5) Set the default DB connection*
+
+config(['database.connections.sqlsrv' =>
+[
+    'driver' => 'sqlsrv',
+    'host' => 'legalsuite.co.za',
+    'port' => '1433',
+    'database' => 'legalsuite',
+    'username' => 'ls',
+    'password' => 'password',
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+]]);
+
+config(['database.default' => 'sqlsrv']);
+
+*6) You should then be able to run Eloquent commands like this:*
+
+$x = App\TableModels\Matter::first();

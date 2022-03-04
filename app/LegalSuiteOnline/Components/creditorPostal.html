@@ -1,0 +1,8 @@
+<div v-if="creditor.postalLine1">{{creditor.postalLine1}}</div>
+<div v-if="creditor.postalLine1">{{creditor.postalLine2}}</div>
+<div v-if="creditor.postalLine3">{{creditor.postalLine3}} 
+    <span v-if="creditor.postalCode"> {{creditor.postalCode}}</span>
+</div>
+<div v-else>{{creditor.postalCode}}</div>
+<div v-if="creditor.postalProvince">{{creditor.postalProvince}}</div>
+<div v-if="creditor.postalCountry">{{creditor.postalCountry}}</div>

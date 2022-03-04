@@ -1,0 +1,132 @@
+<h2 class="text-center">Balance Sheet</h2>
+<h3 class="text-center">{{company.name}}</h3>
+<div class="text-center mb-5">As at {{todaysDate}}</div>
+
+<h3 class="mb-3 font-weight-bold">Assets</h3>
+
+<table class="table table-sm no-border w-100">
+
+	<tbody>
+
+		<tr class="no-border"><td class="no-border" colspan="4"><h4 class="mb-3">Current Assets</h4></td></tr>
+
+		<tr class="no-border" v-bind:key="currentAsset.id" v-for="currentAsset in currentAssets">
+			<td class="text-nowrap no-border">{{currentAsset.description}}</td>
+			<td class="text-nowrap no-border text-right">{{currentAsset.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Current Assets</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalCurrentAssets}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		
+		<tr class="no-border"><td class="no-border" colspan="4"><h4 class="my-3">Fixed Assets</h4></td></tr>
+		
+		<tr class="no-border" v-bind:key="fixedAsset.id" v-for="fixedAsset in fixedAssets">
+			<td class="text-nowrap no-border">{{fixedAsset.description}}</td>
+			<td class="text-nowrap no-border text-right">{{fixedAsset.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Fixed Assets</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalFixedAssets}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="4">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="3"><h4>Total Assets</h4></td>
+			<td class="no-border text-right font-weight-bold">{{totalAssets}}</td>
+		</tr>
+
+	</tbody>
+
+</table>
+
+<h3 class="mb-3 mt-2 font-weight-bold">Liabilities & Owners' Equity</h3>
+
+<table class="table table-sm no-border w-100">
+
+	<tbody>
+
+		<tr class="no-border"><td class="no-border" colspan="4"><h4 class="mb-3">Current Assets</h4></td></tr>
+
+		<tr class="no-border" v-bind:key="currentLiability.id" v-for="currentLiability in currentLiabilities">
+			<td class="text-nowrap no-border">{{currentLiability.description}}</td>
+			<td class="text-nowrap no-border text-right">{{currentLiability.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Current Liabilities</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalCurrentLiabilities}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		
+		<tr class="no-border"><td class="no-border" colspan="4"><h4 class="my-3">Long Term Liabilities</h4></td></tr>
+		
+		<tr class="no-border" v-bind:key="longTermLiability.id" v-for="longTermLiability in longTermLiabilities">
+			<td class="text-nowrap no-border">{{longTermLiability.description}}</td>
+			<td class="text-nowrap no-border text-right">{{longTermLiability.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		<tr class="no-border">
+			<td class="no-border font-weight-bold">Total Long Term Liabilities</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="no-border text-right font-weight-bold">{{totalLongTermLiabilities}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="4">&nbsp;</td>
+		</tr>
+		
+		<tr class="no-border">
+			<td class="no-border" colspan="3"><h4>Total Liabilities</h4></td>
+			<td class="no-border text-right font-weight-bold">{{totalLiabilities}}</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="4">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border"><td class="no-border" colspan="4"><h4 class="mb-3">Owners' Equity</h4></td></tr>
+
+		<tr class="no-border" v-bind:key="equity.id" v-for="equity in equities">
+			<td class="text-nowrap no-border">{{equity.description}}</td>
+			<td class="no-border">&nbsp;</td>
+			<td class="text-nowrap no-border text-right">{{equity.balance}}</td>
+			<td class="no-border">&nbsp;</td>
+		</tr>
+		
+		<tr class="no-border">
+			<td class="no-border" colspan="4">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="3"><h4>Total Owners' Equity</h4></td>
+			<td class="no-border text-right font-weight-bold">{{totalEquities}}</td>
+		</tr>		
+
+		<tr class="no-border">
+			<td class="no-border" colspan="4">&nbsp;</td>
+		</tr>
+
+		<tr class="no-border">
+			<td class="no-border" colspan="3"><h4>Total Equity & Liabilities</h4></td>
+			<td class="no-border text-right font-weight-bold">{{totalEquitiesAndLiabilities}}</td>
+		</tr>		
+
+	</tbody>
+
+</table>

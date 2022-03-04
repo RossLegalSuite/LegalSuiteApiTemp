@@ -1,0 +1,70 @@
+<table class="w-100">
+	<tbody>
+		<tr>
+			<td class="w-65 text-top">
+				<component is="companyLogo">[Company Logo]</component>
+				<component is="companyAddress">[Company Address]</component>
+				<br/>
+			</td>
+			<td class="text-right text-top">
+
+					<h2>Payment</h2>
+
+					<h4><span class="font-weight-bold">Number: </span><span>{{payment.number}}</span></h4>
+
+				<h4><span class="font-weight-bold">Date:</span><span> {{payment.date}}</span></h4>
+
+				<h4 v-if="payment.reference"><span class="font-weight-bold">Our Ref:</span><span> {{payment.reference}}</span></h4>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
+
+
+<div v-if="payment.type == 'Creditor'" class="card w-50 mb-5">
+	<div class="card-header p-2">
+		Payment To
+	</div>
+	<div class="card-body p-2">
+		<div>{{creditor.name}}</div>
+		<component is="creditorPostal">[Creditor Postal]</component>
+	</div>
+</div>
+
+
+<h4 class="text-truncate">{{payment.description}}</h4>
+<div class="row">
+	<div class="col-md-12">
+
+		<table class="table table-sm no-border">
+			<thead>
+				<tr class="bg-gray">
+					<th class="border">Date</th>
+					<th class="border">Your Reference</th>
+					<th class="border text-right">Paid</th>
+					<th class="border text-right">Balance</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-bind:key="transaction.id" v-for="transaction in transactions">
+					<td class="text-nowrap border">{{transaction.date}}</td>
+					<td class="border w-80">{{transaction.reference}}</td>
+					<td class="border text-right">{{transaction.amount}}</td>
+					<td class="border text-right">{{transaction.balance}}</td>
+				</tr>
+				<tr>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+					<td class="border">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="text-nowrap no-border text-right font-weight-bold" colspan="2">Total</td>
+					<td class="text-nowrap border text-right font-weight-bold">{{company.currencySymbol}} {{payment.totalAmount}}</td>
+					<td class="text-nowrap border text-right font-weight-bold">{{company.currencySymbol}} {{payment.balance}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

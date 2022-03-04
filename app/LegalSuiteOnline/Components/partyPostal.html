@@ -1,0 +1,8 @@
+<div v-if="party.postalline1">{{party.postalline1}}</div>
+<div v-if="party.postalline1">{{party.postalline2}}</div>
+<div v-if="party.postalline3">{{party.postalline3}} 
+    <span v-if="party.postalcode"> {{party.postalcode}}</span>
+</div>
+<div v-else>{{party.postalcode}}</div>
+<div v-if="party.postalprovince">{{party.postalprovince}}</div>
+<div v-if="party.postalcountry">{{party.postalcountry}}</div>

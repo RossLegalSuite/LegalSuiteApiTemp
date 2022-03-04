@@ -1,0 +1,34 @@
+<div>
+    <img v-if="company.logo" :src="company.logo" class="img-fluid mb-2" style="height:100px;" alt="company.logo">
+    <h2 v-else="">{{company.name}}</h2>
+</div>
+<table class="w-100">
+	<tbody>
+		<tr>
+            <td style="width:60%; vertical-align: top;">
+                <div>
+                    <span v-if="company.physicalline1">{{company.physicalline1}}</span>
+                    <span v-if="company.physicalline1">&bull; {{company.physicalline2}}</span>
+                    <span v-if="company.physicalline3">&bull; {{company.physicalline3}}</span>
+                    <span v-if="company.physicalcode">&bull; {{company.physicalcode}}</span>
+                </div>
+                <div>
+                    <span v-if="company.postalline1">{{company.postalline1}}</span>
+                    <span v-if="company.postalline1">&bull; {{company.postalline2}}</span>
+                    <span v-if="company.postalline3">&bull; {{company.postalline3}}</span>
+                    <span v-if="company.postalcode">&bull; {{company.postalcode}}</span>
+                </div>
+            </td>
+            <td style="width:40%; vertical-align: top; text-align: right;">
+                <div v-if="company.email">Email: {{company.email}}</div>
+                <div v-if="company.work">Telephone: {{company.work}}</div>
+                <div v-if="company.home">Home: {{company.home}}</div>
+                <div v-if="company.mobile">Cell: {{company.mobile}}</div>
+                <div v-if="company.website">Web Site: {{company.website}}</div>
+                <div v-if="company.fax">Fax: {{company.fax}}</div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div style="border: 1px solid darkgrey; margin: 5px 0px"></div>
+<br/>

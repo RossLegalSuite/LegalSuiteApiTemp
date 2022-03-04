@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Custom;
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+
+
+class LegalSuiteOnlineMigration
+{
+
+    /* For Testing
+    $controller = new \App\Custom\LegalSuiteOnlineMigration;$controller->createTables()
+    $controller = new \App\Custom\LegalSuiteOnlineMigration;$controller->dropTables()
+    See: https://laravel.com/docs/5.0/schema
+    */
+
+    public function createTables() {
+
+        try {
+
+            $tableName = 'LolSettings';
+
+            if ( !Schema::connection('sqlsrv')->hasTable($tableName) ) {
+
+                Schema::connection('sqlsrv')->create($tableName, function (Blueprint $table) {
+                    //$table->unsignedInteger('employeeId');
+                    $table->unsignedInteger('reportTemplateId');
+                    $table->unsignedInteger('trialBalanceTemplateId');
+                    $table->unsignedInteger('incomeStatementTemplateId');
+                    $table->unsignedInteger('balanceSheetTemplateId');
+                    $table->unsignedInteger('reportEmailTemplateId');
+                    $table->unsignedInteger('partiesEmailTemplateId');
+                    $table->unsignedInteger('documentEmailTemplateId');
+                    $table->unsignedInteger('invoiceTemplateId');
+                    $table->unsignedInteger('invoiceEmailTemplateId');
+                    $table->unsignedInteger('paymentTemplateId');
+                    $table->unsignedInteger('paymentEmailTemplateId');
+                    $table->unsignedInteger('receiptTemplateId');
+                    $table->unsignedInteger('receiptEmailTemplateId');
+                    $table->unsignedInteger('statementEmailTemplateId');
+                    $table->unsignedInteger('statementTemplateId');
+
+                });
+
+            }
+
+            $tableName = 'LolSystemTemplates';
+
+            if ( !Schema::connection('sqlsrv')->hasTable($tableName) ) {
+
+                Schema::connection('sqlsrv')->create($tableName, function (Blueprint $table) {
+                    $table->increments('id');
+                    //$table->unsignedInteger('employeeId');
+                    $table->string('source');
+                    $table->string('title')->unique();
+                    $table->string('description');
+                    $table->text('contents')->nullable();
+                    $table->text('footer')->nullable();
+                    $table->text('header')->nullable();
+                    $table->enum('orientation', ['Portrait', 'Landscape'])->default('Portrait');
+                    $table->string('paperSize',20)->default('A4');
+                    $table->string('password')->nullable();
+                    $table->boolean('allowPrint')->default(1);
+                    $table->boolean('allowEdit')->default(0);
+                    $table->boolean('allowCopy')->default(0);
+                    $table->string('bottomMargin')->default('5');
+                    $table->string('topMargin')->default('5');
+                    $table->string('leftMargin')->default('5');
+                    $table->string('rightMargin')->default('5');
+
+                    //$table->foreign('employeeId')->references('RecordID')->on('Employee')->onDelete('cascade');
+
+                });
+
+                //$this->seedTemplates();
+
+            }
+
+        } catch(\Exception $e)  {
+            throw new \Exception('Server Error on line '.$e->getLine().' in '.$e->getFile() .': <br/>'.$e->getMessage());
+        }
+
+    }
+
+    // private function seedTemplates() {
+
+    //     $templatePath = base_path() . '/resources/js/pages/templates/default/';
+
+    //     $contents = file_get_contents($templatePath . 'report.html');
+    //     $template = new SystemTemplate;
+    //     $template->employeeId = 1;
+    //     $template->password = time();
+    //     $template->title = 'Report';
+    //     $template->description = 'Layout used when printing a table report';
+    //     $template->source = 'Report';
+    //     $template->orientation = 'Landscape';
+    //     $template->contents = $contents;
+
+    //     $template->save();
+
+
+    // }
+
+    public function dropTables() {
+        $tableName = 'LolSettings';
+        Schema::connection('sqlsrv')->dropIfExists($tableName);
+
+        $tableName = 'LolSystemTemplates';
+        Schema::connection('sqlsrv')->dropIfExists($tableName);
+    }
+}
