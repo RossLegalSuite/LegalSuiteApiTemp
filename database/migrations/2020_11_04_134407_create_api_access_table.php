@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateApiAccessTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -42,4 +42,4 @@ class CreateApiAccessTable extends Migration
     {
         Schema::dropIfExists('api_access');
     }
-}
+};

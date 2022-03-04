@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveTrafiicLogColumn extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -22,4 +22,4 @@ class RemoveTrafiicLogColumn extends Migration
     {
         $table->text('parameters')->after('id');
     }
-}
+};

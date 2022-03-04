@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateDevelopersTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -38,4 +38,4 @@ class UpdateDevelopersTable extends Migration
         $table->dropColumn('getAccessFlag');
         $table->dropColumn('developer_token');
     }
-}
+};
