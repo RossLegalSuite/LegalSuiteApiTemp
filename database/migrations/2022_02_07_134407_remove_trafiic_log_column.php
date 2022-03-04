@@ -6,24 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class RemoveTrafiicLogColumn extends Migration
 {
-    
     public function up()
     {
-        
         Schema::table('trafficlog', function (Blueprint $table) {
-            
-                $table->dropColumn('parameters');
+            $table->dropColumn('parameters');
         });
     }
-    
+
     /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         $table->text('parameters')->after('id');
-        
     }
 }

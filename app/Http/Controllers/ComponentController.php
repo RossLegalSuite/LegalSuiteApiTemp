@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Custom\ControllerHelper;
 use App\LegalSuiteOnline\Models\LolComponent;
 use Illuminate\Http\Request;
+
 //use Illuminate\Support\Facades\DB;
 
 class ComponentController extends Controller
 {
-
     /*public function get(Request $request) {
 
         try {
@@ -51,7 +50,7 @@ class ComponentController extends Controller
 
             //     }
 
-            // }            
+            // }
 
             // $returnData->data = $query->get();
 
@@ -67,15 +66,14 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         try {
-
             $requestData = $request->all();
 
             $this->validateData($requestData);
 
             return json_encode(LolComponent::create($requestData));
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
@@ -83,8 +81,7 @@ class ComponentController extends Controller
     public function update(Request $request)
     {
         try {
-
-			$requestData = $request->all();
+            $requestData = $request->all();
 
             $this->validateData($requestData);
 
@@ -95,27 +92,24 @@ class ComponentController extends Controller
             $recordData->update($requestData);
 
             return json_encode($recordData);
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
 
-
-
     public function delete(Request $request)
     {
         try {
+            $requestData = $request->all();
 
-			$requestData = $request->all();
+            $recordData = LolComponent::findOrFail($requestData['recordid'])->delete();
 
-    		$recordData = LolComponent::findOrFail($requestData['recordid'])->delete();
-
-			return ControllerHelper::PostPutDeleteFormatHelper($recordData, $request);
-
-        } catch(\Exception $e)  {
+            return ControllerHelper::PostPutDeleteFormatHelper($recordData, $request);
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
@@ -123,42 +117,37 @@ class ComponentController extends Controller
     public function getTablePosition(Request $request)
     {
         try {
-
             $returnData = new \stdClass();
 
-    		$returnData->data = LolComponent::whereRaw('title < \'' . $request['title'] . '\'')->count();
+            $returnData->data = LolComponent::whereRaw('title < \''.$request['title'].'\'')->count();
 
             return json_encode($returnData);
-            
+
             /* Testing
                 use App\LegalSuiteOnline\Models\LolComponent;
                 $returnData = new \stdClass();
                 $request['title'] = 'Letter Example';
                 $returnData->data = LolComponent::whereRaw('title < \'' . $request['title'] . '\'')->count();
             */
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
 
-
-    private function validateData($record) {
-
-        if ( !isset($record['title']) ) {
-            throw new \Exception("Please provide a title");
-        }
-        
-        if ( !isset($record['description']) ) {
-            throw new \Exception("Please provide a description");
-        }
-        
-        if ( !isset($record['source']) ) {
-            throw new \Exception("The source is required.");
+    private function validateData($record)
+    {
+        if (! isset($record['title'])) {
+            throw new \Exception('Please provide a title');
         }
 
+        if (! isset($record['description'])) {
+            throw new \Exception('Please provide a description');
+        }
+
+        if (! isset($record['source'])) {
+            throw new \Exception('The source is required.');
+        }
     }
-
-
 }

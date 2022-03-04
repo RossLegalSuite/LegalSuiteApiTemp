@@ -7,30 +7,25 @@ use Illuminate\Http\Request;
 
 class LolSettingsController extends Controller
 {
-
-    public function get(Request $request) {
-
+    public function get(Request $request)
+    {
         try {
-
             $returnData = new \stdClass();
 
             $returnData->data = lolsettings::firstOrFail();
 
             return json_encode($returnData);
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
-
     }
-
 
     public function update(Request $request)
     {
         try {
-
-			$requestData = $request->all();
+            $requestData = $request->all();
 
             $recordData = lolsettings::firstOrFail();
 
@@ -41,13 +36,10 @@ class LolSettingsController extends Controller
             $returnData['data'] = $recordData;
 
             return json_encode($returnData);
-
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             $returnData['errors'] = $e->getMessage();
+
             return $returnData;
         }
     }
-
-
 }

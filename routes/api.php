@@ -1,6 +1,8 @@
 <?php
+
 //use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
     Route::middleware('auth:api')->post('/getUserData', 'AdminController@getUserData');
-    
+
     Route::post('/getapikey', 'AuthController@getApiKey');
     Route::get('/auth', 'AuthController@auth');
     Route::post('/auth', 'AuthController@auth');
@@ -35,7 +37,7 @@ use Illuminate\Support\Facades\Route;
     Route::middleware('authenticate')->post('{tablename}/view', 'GenericController@view');
     Route::middleware('authenticate')->post('{tablename}/first', 'GenericController@first');
     Route::middleware('authenticate')->post('{tablename}/copy', 'GenericController@copy');
-    
+
     // Need these in LegalSuiteOnline to generate documents and save them afterwards
     Route::middleware('authenticate')->post('{tablename}/gettemplatedata/{recordid?}', 'GenericController@getTemplateData');
     Route::middleware('authenticate')->post('{tablename}/storerecords', 'GenericController@storeRecords');
@@ -62,7 +64,6 @@ use Illuminate\Support\Facades\Route;
     //***************************************************************/
 
     Route::prefix('utils')->group(function () {
-    
         Route::middleware('authenticate')->post('checksecurity', 'UtilsController@checkSecurity');
 
         Route::middleware('authenticate')->post('gettagged', 'UtilsController@getTagged');
@@ -90,7 +91,6 @@ use Illuminate\Support\Facades\Route;
 
         //Route::middleware('authenticate')->get('testget', 'TestController@testGet');
         //Route::middleware('authenticate')->post('testpost', 'TestController@testPost');
-
     });
     //##Depricated
     // Route::middleware('authenticate')->post('/login', 'LoginController@login');
@@ -116,9 +116,7 @@ use Illuminate\Support\Facades\Route;
     Route::middleware('authenticate')->get('/createapiroutes', 'CreateModelAndControllersController@CreateApiRoutes');
 
     Route::middleware('authenticate')->prefix('custom')->group(function () {
-        
         Route::get('/disbursement/{id}', 'CustomControllers\DisbursementController@getDisbursements');
         Route::get('/linked-disbursement/{id}', 'CustomControllers\DisbursementController@getLinkedDisbursements');
         Route::get('/getfeeitems/{id}', 'CustomControllers\DisbursementController@getfeeitems');
-        
     });

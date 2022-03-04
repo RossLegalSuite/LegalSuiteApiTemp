@@ -27,7 +27,6 @@ class CreateErrorLogTable extends Migration
             $table->string('line', 20)->nullable();
 
             $table->timestamps();
-
         });
     }
 

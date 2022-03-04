@@ -6,25 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class UpdateClientsTable extends Migration
 {
-    
     public function up()
     {
-        
         Schema::table('clients', function (Blueprint $table) {
-            
             $table->string('firmcode')->after('company_name');
-            
         });
     }
-    
+
     /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         $table->dropColumn('firmcode');
-        
     }
 }

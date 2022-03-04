@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 class QueryBuilder
 {
-
     public static function MatterSelectBuilder(&$query)
     {
         try {
@@ -41,29 +40,29 @@ class QueryBuilder
             ->addselect(DB::raw("CASE WHEN ISNULL(ConveyData.Step6Completed,0) = 0 OR ConveyData.Step6Completed = 0 OR ConveyData.Step6Completed > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ConveyData.Step6Completed-36163 as DateTime),106) END AS FormattedStep6Completed"))
             ->addselect(DB::raw("CASE WHEN ISNULL(Matter.UpdatedByTime,0) = 0 OR Matter.UpdatedByTime = 0 THEN '' ELSE  CONVERT(VARCHAR,DateAdd(millisecond,(Matter.UpdatedByTime * 10) ,0),108) END AS FormattedUpdatedByTime"))
             ->addselect(DB::raw("CASE WHEN Matter.Access = 'O' THEN 'Open to All' WHEN Matter.Access = 'V' THEN 'View Only' WHEN Matter.Access = 'R' THEN 'Restricted' ELSE 'Unspecified' END AS FormattedAccess"));
-    
+
             */
             $query->addselect([
-                "Matter.*",
-                "Employee.Name as EmployeeName",
-                "Party.Name as PartyName",
-                "Party.MatterPrefix as PartyMatterPrefix",
-                "MatType.Description AS MatTypeDescription",
-                "Docgen.Description AS DocGenDescription",
-                "CostCentre.Description AS CostCentreDescription",
-                "PlanOfAction.Description AS PlanOfActionDescription",
-                "Branch.Description AS BranchDescription",
-                "StageGroup.Description AS StageGroupDescription",
-                "ClientFeeSheet.Description AS ClientFeeSheetDescription",
-                "DebtorFeeSheet.Description AS DebtorFeeSheetDescription",
-                "DocumentLanguage.Description AS DocumentLanguageDescription",
-                "AccountsLanguage.Description AS AccountsLanguageDescription",
-                "TrustBank.Description AS TrustBankDescription",
-                "BusinessBank.Description AS BusinessBankDescription",
-                "IncomeAccount.Description AS IncomeAccountDescription",
-                "BillingRate.Description AS BillingRateDescription",
-                "InvoiceParty.Name AS InvoicePartyName",
-                "DocScrn.Description as ExtraScreenDescription",
+                'Matter.*',
+                'Employee.Name as EmployeeName',
+                'Party.Name as PartyName',
+                'Party.MatterPrefix as PartyMatterPrefix',
+                'MatType.Description AS MatTypeDescription',
+                'Docgen.Description AS DocGenDescription',
+                'CostCentre.Description AS CostCentreDescription',
+                'PlanOfAction.Description AS PlanOfActionDescription',
+                'Branch.Description AS BranchDescription',
+                'StageGroup.Description AS StageGroupDescription',
+                'ClientFeeSheet.Description AS ClientFeeSheetDescription',
+                'DebtorFeeSheet.Description AS DebtorFeeSheetDescription',
+                'DocumentLanguage.Description AS DocumentLanguageDescription',
+                'AccountsLanguage.Description AS AccountsLanguageDescription',
+                'TrustBank.Description AS TrustBankDescription',
+                'BusinessBank.Description AS BusinessBankDescription',
+                'IncomeAccount.Description AS IncomeAccountDescription',
+                'BillingRate.Description AS BillingRateDescription',
+                'InvoiceParty.Name AS InvoicePartyName',
+                'DocScrn.Description as ExtraScreenDescription',
                 DB::raw("CASE WHEN ISNULL(Matter.DateInstructed,0) = 0 OR Matter.DateInstructed = 0 OR Matter.DateInstructed > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Matter.DateInstructed-36163 as DateTime),106) END AS FormattedDateInstructed"),
                 DB::raw("CASE WHEN ISNULL(Matter.PrescriptionDate,0) = 0 OR Matter.PrescriptionDate = 0 OR Matter.PrescriptionDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Matter.PrescriptionDate-36163 as DateTime),106) END AS FormattedPrescriptionDate"),
                 DB::raw("CASE WHEN ISNULL(Matter.ArchiveDate,0) = 0 OR Matter.ArchiveDate = 0 OR Matter.ArchiveDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Matter.ArchiveDate-36163 as DateTime),106) END AS FormattedArchiveDate"),
@@ -75,21 +74,14 @@ class QueryBuilder
                 DB::raw("CASE WHEN ISNULL(Matter.UpdatedByTime,0) = 0 OR Matter.UpdatedByTime = 0 THEN '' ELSE  CONVERT(VARCHAR,DateAdd(millisecond,(Matter.UpdatedByTime * 10) ,0),108) END AS FormattedUpdatedByTime"),
                 DB::raw("CASE WHEN Matter.Access = 'O' THEN 'Open to All' WHEN Matter.Access = 'V' THEN 'View Only' WHEN Matter.Access = 'R' THEN 'Restricted' ELSE 'Unspecified' END AS FormattedAccess"),
             ]);
-
-            
-
-
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-
     }
-    
+
     public static function MatterJoinBuilder(&$query)
     {
-
         try {
-
             $query
             ->leftJoin('Employee', 'Matter.EmployeeID', '=', 'Employee.RecordID')
             ->leftJoin('MatType', 'Matter.MatterTypeID', '=', 'MatType.RecordID')
@@ -112,37 +104,32 @@ class QueryBuilder
             ->leftJoin('Business as IncomeAccount', 'Matter.IncomeAccID', '=', 'IncomeAccount.RecordID')
             // ->leftJoin('docscrn', 'Matter.extrascreenid', '=', 'docscrn.RecordID')
             ->leftJoin('Business as BusinessBank', 'Matter.BusinessBankID', '=', 'BusinessBank.RecordID');
-            
-
-        
-        } catch(\Exception $e)  {
+        } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-    
     }
-    
+
     public static function PartySelectBuilder(&$query)
     {
-        
         $query->addselect([
-            "Party.*",
-            "Role.Description as RoleDescription",
-            "Entity.Description as EntityDescription",
-            "Entity.JuristicFlag as EntityJuristicFlag",
-            "Entity.Category as EntityCategory",
-            "ParType.Description as ParTypeDescription",
-            "ParType.Category as ParTypeCategory",
-            "Email.Number as EmailAddress",
-            "Work.Number as WorkNumber",
-            "Home.Number as HomeNumber",
-            "Cell.Number as CellNumber",
-            "Role.RoleScrnFlag as RoleScrnFlag",
-            "Role.RoleScrnId as RoleScrnId",
-            "physicalCountry.Description as physicalCountryDescription",
-            "postalCountry.Description as postalCountryDescription",
-            "Language.Description as defaultLanguageDescription",
-            "BillingMatter.FileRef as billingMatterFileRef",
-            "BillingMatter.Description as billingmatterDescription",
+            'Party.*',
+            'Role.Description as RoleDescription',
+            'Entity.Description as EntityDescription',
+            'Entity.JuristicFlag as EntityJuristicFlag',
+            'Entity.Category as EntityCategory',
+            'ParType.Description as ParTypeDescription',
+            'ParType.Category as ParTypeCategory',
+            'Email.Number as EmailAddress',
+            'Work.Number as WorkNumber',
+            'Home.Number as HomeNumber',
+            'Cell.Number as CellNumber',
+            'Role.RoleScrnFlag as RoleScrnFlag',
+            'Role.RoleScrnId as RoleScrnId',
+            'physicalCountry.Description as physicalCountryDescription',
+            'postalCountry.Description as postalCountryDescription',
+            'Language.Description as defaultLanguageDescription',
+            'BillingMatter.FileRef as billingMatterFileRef',
+            'BillingMatter.Description as billingmatterDescription',
             DB::raw("CASE WHEN ISNULL(Party.LastContactDate,0) = 0 OR Party.LastContactDate = 0 OR Party.LastContactDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Party.LastContactDate-36163 as DateTime),106) END AS FormattedLastContactDate"),
             DB::raw("CASE WHEN ISNULL(Party.UpdatedByDate,0) = 0 OR Party.UpdatedByDate = 0 OR Party.UpdatedByDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Party.UpdatedByDate-36163 as DateTime),106) END AS FormattedUpdatedByDate"),
             DB::raw("CASE WHEN ISNULL(Party.LastInstructedDate,0) = 0 OR Party.LastInstructedDate = 0 OR Party.LastInstructedDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(Party.LastInstructedDate-36163 as DateTime),106) END AS FormattedLastInstructedDate"),
@@ -157,7 +144,7 @@ class QueryBuilder
         ]);
 
         /*$query->addselect("Party.*")
-        
+
         ->addselect("Role.Description as RoleDescription")
         ->addselect("Entity.Description as EntityDescription")
         ->addselect("Entity.JuristicFlag as EntityJuristicFlag")
@@ -186,15 +173,13 @@ class QueryBuilder
 
         ->addselect(DB::raw("ParLang.PhysicalLine1 + ' ' + ParLang.PhysicalLine2  + ' ' + ParLang.PhysicalLine3 + ' ' + ParLang.PhysicalCode as PhysicalAddress"))
         ->addselect(DB::raw("ParLang.PostalLine1 + ' ' + ParLang.PostalLine2  + ' ' + ParLang.PostalLine3 + ' ' + ParLang.PostalCode as PostalAddress"))
-        
+
         ->addselect(DB::raw("CASE WHEN ISNULL(party.UpdatedByTime,0) = 0 OR party.UpdatedByTime = 0 THEN '' ELSE  CONVERT(VARCHAR,DateAdd(millisecond,(party.UpdatedByTime * 10) ,0),108) END AS FormattedUpdatedByTime"))
         ->addselect(DB::raw("CASE WHEN ISNULL(party.CreatedTime,0) = 0 OR party.CreatedTime = 0 THEN '' ELSE  CONVERT(VARCHAR,DateAdd(millisecond,(party.CreatedTime * 10) ,0),108) END AS FormattedCreatedTime"));*/
-
     }
-    
+
     public static function PartyJoinBuilder(&$query)
     {
-        
         $query->leftJoin('ParLang', function ($join) {
             $join->on('ParLang.PartyID', '=', 'Party.RecordID')
             ->on('ParLang.LanguageID', '=', 'Party.DefaultLanguageID');
@@ -206,11 +191,11 @@ class QueryBuilder
         ->leftJoin('Entity', 'Party.EntityID', '=', 'Entity.RecordID')
         ->leftJoin('ParType', 'Party.PartyTypeID', '=', 'ParType.RecordID')
         ->leftJoin('Language ', 'Party.DefaultLanguageID', '=', 'Language.RecordID')
-        
+
         ->join('Control', function ($join) {
             $join->where('Control.RecordID', '=', 1);
         })
-        
+
         ->leftJoin('ParTele as Email', function ($join) {
             $join->on('Email.PartyID', '=', 'Party.RecordID')
             ->on('Email.TelephoneTypeID', '=', 'Control.EMailPhoneID')
@@ -235,33 +220,30 @@ class QueryBuilder
 
     public static function MatPartySelectBuilder(&$query)
     {
-        
-        $query->addselect("MatParty.*")
-        ->addselect("Party.Name AS PartyName")
-        ->addselect("Contact.Name AS ContactName")
-        ->addselect("Contact.RecordID AS ContactRecordID")
-        ->addselect("Role.Description as RoleDescription")
-        ->addSelect("Language.Description as languageDescription")
-        ->addselect("Email.Number as EmailAddress")
-        ->addselect("Work.Number as WorkNumber")
-        ->addselect("Home.Number as HomeNumber")
-        ->addselect("Cell.Number as CellNumber");
-
+        $query->addselect('MatParty.*')
+        ->addselect('Party.Name AS PartyName')
+        ->addselect('Contact.Name AS ContactName')
+        ->addselect('Contact.RecordID AS ContactRecordID')
+        ->addselect('Role.Description as RoleDescription')
+        ->addSelect('Language.Description as languageDescription')
+        ->addselect('Email.Number as EmailAddress')
+        ->addselect('Work.Number as WorkNumber')
+        ->addselect('Home.Number as HomeNumber')
+        ->addselect('Cell.Number as CellNumber');
     }
-    
+
     public static function MatPartyJoinBuilder(&$query)
     {
-        
         $query->leftJoin('Party', 'MatParty.PartyID', '=', 'Party.RecordID')
 
         ->leftJoin('Party AS Contact', 'Contact.RecordID', '=', 'MatParty.ContactID')
         ->leftJoin('Role', 'MatParty.RoleID', '=', 'Role.RecordID')
         ->leftJoin('Language ', 'MatParty.LanguageID', '=', 'Language.RecordID')
-        
+
         ->join('Control', function ($join) {
             $join->where('Control.RecordID', '=', 1);
         })
-        
+
         ->leftJoin('ParTele as Email', function ($join) {
             $join->on('Email.PartyID', '=', 'Party.RecordID')
             ->on('Email.TelephoneTypeID', '=', 'Control.EMailPhoneID')
@@ -283,85 +265,74 @@ class QueryBuilder
             ->where('Cell.Sorter', '=', 1);
         });
     }
-    
+
     public static function DocLogSelectBuilder(&$query)
     {
-        $query->addselect("DocLog.*")
+        $query->addselect('DocLog.*')
 
-        ->addselect("Matter.FileRef")
-        ->addselect("Matter.Description AS MatterDescription")
-        ->addselect("Employee.Name AS EmployeeName")
-        ->addselect("DocLogCategory.Description AS Category")
-        
+        ->addselect('Matter.FileRef')
+        ->addselect('Matter.Description AS MatterDescription')
+        ->addselect('Employee.Name AS EmployeeName')
+        ->addselect('DocLogCategory.Description AS Category')
+
         ->addselect(DB::raw("CASE WHEN DocLog.Time > 0 THEN CONVERT(VARCHAR,DateAdd(millisecond,(Doclog.Time * 10) ,0),108) ELSE '' END AS FormattedTime"))
-        ->addselect(DB::raw("CASE WHEN DocLog.EmailFlag = 1 OR DocLog.EmailFlag = 2 THEN DocLog.EmailFolder ELSE DocLog.SavedName END AS SavedName"))
-        ->addselect(DB::raw("CASE WHEN DocLog.EmailFlag = 1 OR DocLog.EmailFlag = 2 THEN DocLog.EmailFrom ELSE Employee.Name END AS Sender"))
+        ->addselect(DB::raw('CASE WHEN DocLog.EmailFlag = 1 OR DocLog.EmailFlag = 2 THEN DocLog.EmailFolder ELSE DocLog.SavedName END AS SavedName'))
+        ->addselect(DB::raw('CASE WHEN DocLog.EmailFlag = 1 OR DocLog.EmailFlag = 2 THEN DocLog.EmailFrom ELSE Employee.Name END AS Sender'))
         ->addselect(DB::raw("CASE WHEN DocLog.Date > 0 THEN CONVERT(VarChar(12),CAST(DocLog.Date-36163 as DateTime),103) ELSE '' END AS FormattedDate"))
         ->addselect(DB::raw("CASE WHEN DocLog.EmailFlag = 1 OR DocLog.EmailFlag = 2 THEN DocLog.EmailRecipients ELSE '' END AS SentTo"))
         ->addselect(DB::raw("CASE WHEN DocLog.Direction = 1 THEN 'Outgoing' WHEN DocLog.Direction = 2 THEN 'Incoming' ELSE 'Not Applicable' END AS Direction"));
-        
     }
-    
+
     public static function DocLogJoinBuilder(&$query)
     {
         $query->leftJoin('Matter', 'Matter.RecordID', '=', 'DocLog.MatterID')
         ->leftJoin('DocLogCategory', 'DocLog.DocLogCategoryID', '=', 'DocLogCategory.RecordID')
         ->leftJoin('Employee', 'Employee.RecordID', '=', 'DocLog.EmployeeID');
-        
     }
-    
+
     public static function DocgenSelectBuilder(&$query)
     {
-        $query->addselect("DocGen.*")
-        ->addselect("ToDoGroup.Description AS ToDoGroupDescription");
-        
+        $query->addselect('DocGen.*')
+        ->addselect('ToDoGroup.Description AS ToDoGroupDescription');
     }
-    
+
     public static function DocgenJoinBuilder(&$query)
     {
         $query->leftJoin('ToDoGroup', 'ToDoGroup.RecordID', '=', 'DocGen.ToDoGroupID');
-        
     }
-    
+
     public static function MatTypeSelectBuilder(&$query)
     {
-        $query->addselect("MatType.*")
-        ->addselect("FeeSheet.Description AS FeeSheetDescription");
-        
+        $query->addselect('MatType.*')
+        ->addselect('FeeSheet.Description AS FeeSheetDescription');
     }
-    
+
     public static function MatTypeJoinBuilder(&$query)
     {
         $query->leftJoin('FeeSheet', 'FeeSheet.RecordID', '=', 'MatType.FeeSheetID');
-        
     }
-    
 
     public static function BranchSelectBuilder(&$query)
     {
-        $query->addselect("Branch.*")
-        ->addselect("Business.RecordID AS BusinessBankID")
-        ->addselect("Business.Description AS BusinessBankDescription")
-        ->addselect("Trust.RecordID AS TrustBankID")
-        ->addselect("Trust.Description AS TrustBankDescription");
-
+        $query->addselect('Branch.*')
+        ->addselect('Business.RecordID AS BusinessBankID')
+        ->addselect('Business.Description AS BusinessBankDescription')
+        ->addselect('Trust.RecordID AS TrustBankID')
+        ->addselect('Trust.Description AS TrustBankDescription');
     }
-    
+
     public static function BranchJoinBuilder(&$query)
     {
         $query->leftJoin('Business', 'Business.RecordID', '=', 'Branch.BusinessBankID')
         ->leftJoin('Business as Trust', 'Trust.RecordID', '=', 'Branch.TrustBankID');
-
     }
-
 
     public static function ToDoNoteSelectBuilder(&$query)
     {
-        $query->addselect("ToDoNote.*")
-        
-        
-        ->addselect("Matter.FileRef")
-        ->addselect("Matter.Description AS MatterDescription")
+        $query->addselect('ToDoNote.*')
+
+        ->addselect('Matter.FileRef')
+        ->addselect('Matter.Description AS MatterDescription')
 
         ->addselect(DB::raw("CASE WHEN ISNULL(ToDoNote.Date,0) = 0 OR ToDoNote.Date = 0 OR ToDoNote.Date > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ToDoNote.Date-36163 as DateTime),106) END AS FormattedDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ToDoNote.DateDone,0) = 0 OR ToDoNote.DateDone = 0 OR ToDoNote.DateDone > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ToDoNote.DateDone-36163 as DateTime),106) END AS FormattedDateDone"))
@@ -370,68 +341,64 @@ class QueryBuilder
         ->addselect(DB::raw("CASE WHEN ISNULL(ToDoNote.DateAdjustment,0) = 0 OR ToDoNote.DateAdjustment = 0 OR ToDoNote.DateAdjustment > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ToDoNote.DateAdjustment-36163 as DateTime),106) END AS FormattedDateAdjustment"))
 
         ->addselect(DB::raw("CASE WHEN ToDoNote.CreatedTime > 0 THEN CONVERT(VARCHAR,DateAdd(millisecond,(ToDoNote.CreatedTime * 10) ,0),108) ELSE '' END AS FormattedCreatedTime"))
-        ->addselect("Employee.Name AS EmployeeName")
-        ->addselect("CreatedBy.Name AS CreatedByEmployee")
-        ->addselect("CompletedBy.Name AS CompletedByEmployee");
-        
+        ->addselect('Employee.Name AS EmployeeName')
+        ->addselect('CreatedBy.Name AS CreatedByEmployee')
+        ->addselect('CompletedBy.Name AS CompletedByEmployee');
     }
-    
+
     public static function ToDoNoteJoinBuilder(&$query)
     {
         $query->leftJoin('Matter', 'Matter.RecordID', '=', 'ToDoNote.MatterID')
         ->leftJoin('Employee', 'Employee.RecordID', '=', 'ToDoNote.EmployeeID')
         ->leftJoin('Employee as CreatedBy', 'CreatedBy.RecordID', '=', 'ToDoNote.CreatedByID')
         ->leftJoin('Employee as CompletedBy', 'CompletedBy.RecordID', '=', 'ToDoNote.CompletedByID');
-        
     }
-    
+
     public static function FeeNoteSelectBuilder(&$query)
     {
         $control = DB::connection('sqlsrv')
         ->table('Control')
         ->select('VatPercent1', 'VatPercent2', 'VatPercent3')
         ->first();
-        
-        $query->addselect("FeeNote.*")
-        
-        ->addselect("Matter.FileRef AS MatterFileRef")
-        ->addselect("Matter.Description AS MatterDescription")
-        ->addselect("CostCentre.Description AS CostCentre")
-        ->addselect("Employee.Name AS EmployeeName")
-        ->addselect(DB::raw("FeeNote.AmountIncl - FeeNote.VatAmount AS AmountExcl"))
+
+        $query->addselect('FeeNote.*')
+
+        ->addselect('Matter.FileRef AS MatterFileRef')
+        ->addselect('Matter.Description AS MatterDescription')
+        ->addselect('CostCentre.Description AS CostCentre')
+        ->addselect('Employee.Name AS EmployeeName')
+        ->addselect(DB::raw('FeeNote.AmountIncl - FeeNote.VatAmount AS AmountExcl'))
 
         ->addselect(DB::raw("CASE WHEN ISNULL(FeeNote.Date,0) = 0 OR FeeNote.Date = 0 OR FeeNote.Date > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(FeeNote.Date-36163 as DateTime),106) END AS FormattedDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(FeeNote.PostedDate,0) = 0 OR FeeNote.PostedDate = 0 OR FeeNote.PostedDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(FeeNote.PostedDate-36163 as DateTime),106) END AS FormattedPostedDate"))
 
-        ->addselect(DB::raw("CASE WHEN FeeNote.VatRate = '1' THEN '" . $control->VatPercent1 . "%'
-        WHEN FeeNote.VatRate = '2' THEN '" . $control->VatPercent2 . "%'
-        WHEN FeeNote.VatRate = '3' THEN '" . $control->VatPercent3 . "%'
+        ->addselect(DB::raw("CASE WHEN FeeNote.VatRate = '1' THEN '".$control->VatPercent1."%'
+        WHEN FeeNote.VatRate = '2' THEN '".$control->VatPercent2."%'
+        WHEN FeeNote.VatRate = '3' THEN '".$control->VatPercent3."%'
         WHEN FeeNote.VatRate = 'N' THEN 'No Vat'
         WHEN FeeNote.VatRate = 'E' THEN 'Exempt'
         WHEN FeeNote.VatRate = 'Z' THEN 'Zero Rated'
         ELSE 'Unknown' END AS VatRate"));
-        
+
         // ->addselect(DB::raw("CASE WHEN FeeNote.Date > 0 THEN CONVERT(VarChar(12),CAST(FeeNote.Date-36163 as DateTime),103) ELSE '' END AS 'Date'"))
-        
     }
-    
+
     public static function FeeNoteJoinBuilder(&$query)
     {
         $query->leftJoin('Employee', 'Employee.RecordID', '=', 'FeeNote.EmployeeID')
         ->leftJoin('CostCentre', 'FeeNote.CostCentreID', '=', 'CostCentre.RecordID')
         ->leftJoin('Matter', 'Matter.recordID', '=', 'FeeNote.MatterID');
-        
     }
-    
+
     public static function FileNoteSelectBuilder(&$query)
     {
-        $query->addselect("FileNote.*")
-        
-        ->addselect("Matter.FileRef")
-        ->addselect("Matter.Description AS MatterDescription")
-        ->addselect("Employee.Name AS EmployeeName")
-        ->addselect("CreatedByEmployee.Name AS CreatedByEmployee")
-        
+        $query->addselect('FileNote.*')
+
+        ->addselect('Matter.FileRef')
+        ->addselect('Matter.Description AS MatterDescription')
+        ->addselect('Employee.Name AS EmployeeName')
+        ->addselect('CreatedByEmployee.Name AS CreatedByEmployee')
+
         ->addselect(DB::raw("CASE WHEN ISNULL(FileNote.Date,0) = 0 OR FileNote.Date = 0 OR FileNote.Date > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(FileNote.Date-36163 as DateTime),106) END AS FormattedDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(FileNote.AutoNotifyDate,0) = 0 OR FileNote.AutoNotifyDate = 0 OR FileNote.AutoNotifyDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(FileNote.AutoNotifyDate-36163 as DateTime),106) END AS FormattedAutoNotifyDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(FileNote.CreatedDate,0) = 0 OR FileNote.CreatedDate = 0 OR FileNote.CreatedDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(FileNote.CreatedDate-36163 as DateTime),106) END AS FormattedCreatedDate"))
@@ -442,72 +409,64 @@ class QueryBuilder
 
         ->addselect(DB::raw("CASE WHEN ISNULL(Stage.Code,'') = '' THEN '' ELSE Stage.Code END AS StageCode"))
         ->addselect(DB::raw("CASE WHEN ISNULL(Stage.Description,'') = '' THEN '' ELSE Stage.Description END AS StageDescription"));
-        
-
     }
-    
+
     public static function FileNoteJoinBuilder(&$query)
     {
         $query->leftJoin('Matter', 'Matter.RecordID', '=', 'FileNote.MatterID')
         ->leftJoin('Stage', 'Stage.RecordID', '=', 'FileNote.StageID')
         ->leftJoin('Employee', 'Employee.RecordID', '=', 'FileNote.EmployeeID')
         ->leftjoin('Employee as CreatedByEmployee', 'FileNote.CreatedBy', '=', 'CreatedByEmployee.RecordID');
-        
     }
-    
+
     // public static function MatPartySelectBuilder(&$query)
     // {
     //     $query->addselect("MatParty.*")
-        
-        
+
     //     ->addselect("Party.Name as PartyName")
     //     ->addselect("Matter.FileRef as MatterFileRef")
     //     ->addselect("Role.Description as RoleDescription")
     //     ->addselect("PartyContact.Name AS PartyContactName");
     //     // ->addselect(DB::raw("CASE WHEN MatParty.Sorter <> 1 THEN Role.Description + ' (' + CAST(MatParty.Sorter AS VarChar(10)) + ')' ELSE Role.Description END AS Role"))
-        
+
     // }
-    
+
     // public static function MatPartyJoinBuilder(&$query)
     // {
     //     $query->leftJoin('Party AS PartyContact', 'PartyContact.RecordID', '=', 'MatParty.ContactID')
     //     ->leftJoin('Matter', 'MatParty.MatterID', '=', 'Matter.RecordID')
     //     ->leftJoin('Party', 'MatParty.PartyID', '=', 'Party.RecordID')
     //     ->leftJoin('Role', 'MatParty.RoleID', '=', 'Role.RecordID');
-        
+
     // }
-    
+
     public static function StageSelectBuilder(&$query)
     {
-        $query->addselect("Stage.*")
-        ->addselect("StageGroup.Description as StageGroupDescription");
-        
+        $query->addselect('Stage.*')
+        ->addselect('StageGroup.Description as StageGroupDescription');
     }
-    
+
     public static function StageJoinBuilder(&$query)
     {
         $query->leftJoin('StageGroup', 'Stage.StageGroupID', '=', 'StageGroup.RecordID');
-        
     }
-    
+
     public static function EmployeeSelectBuilder(&$query)
     {
-        $query->addselect("Employee.*")
-        ->addselect("CostCentre.Description as CostCentreDescription")
-        ->addselect("EmpType.Description as EmpTypeDescription");
-        
+        $query->addselect('Employee.*')
+        ->addselect('CostCentre.Description as CostCentreDescription')
+        ->addselect('EmpType.Description as EmpTypeDescription');
     }
-    
+
     public static function EmployeeJoinBuilder(&$query)
     {
         $query->leftJoin('EmpType', 'Employee.EmployeeTypeID', '=', 'EmpType.RecordID')
         ->leftJoin('CostCentre', 'Employee.DefaultCostCentreId', '=', 'CostCentre.RecordID');
-        
     }
-    
+
     public static function BusinessSelectBuilder(&$query)
     {
-        $query->addselect("Business.*")
+        $query->addselect('Business.*')
         ->addselect(DB::raw("
         CASE WHEN Business.Type = '1' THEN 'Income'
         WHEN Business.Type = '2' THEN 'Expense'
@@ -531,30 +490,26 @@ class QueryBuilder
         WHEN Business.Type = '15' THEN 'Investment S86(4)'
         WHEN Business.Type = '16' THEN 'Trust Creditor'
         ELSE '***UnKnown***' END AS TypeDescription"));
-        
     }
 
     public static function ParTeleSelectBuilder(&$query)
     {
-        $query->addselect("ParTele.*")
-        ->addselect("Party.Name AS PartyName")
-        ->addselect("Party.MatterPrefix as PartyMatterPrefix")
-        ->addSelect("teletype.description as teleTypeDescription")
-        ->addSelect("teletype.internalflag as teleTypeInternalFlag");
-
+        $query->addselect('ParTele.*')
+        ->addselect('Party.Name AS PartyName')
+        ->addselect('Party.MatterPrefix as PartyMatterPrefix')
+        ->addSelect('teletype.description as teleTypeDescription')
+        ->addSelect('teletype.internalflag as teleTypeInternalFlag');
     }
 
     public static function ParTeleJoinBuilder(&$query)
     {
         $query->leftJoin('party', 'partele.partyId', '=', 'party.recordid');
         $query->leftJoin('teletype', 'partele.telephonetypeId', '=', 'teletype.recordid');
-        
     }
 
     public static function ColDataSelectBuilder(&$query)
     {
-
-        $query->addselect("ColData.*")
+        $query->addselect('ColData.*')
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.AODDate,0) = 0 OR ColData.AODDate = 0 OR ColData.AODDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.AODDate-36163 as DateTime),106) END AS FormattedAODDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.EMOInterestTo,0) = 0 OR ColData.EMOInterestTo = 0 OR ColData.EMOInterestTo > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.EMOInterestTo-36163 as DateTime),106) END AS FormattedEMOInterestTo"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.CCJInterestTo,0) = 0 OR ColData.CCJInterestTo = 0 OR ColData.CCJInterestTo > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.CCJInterestTo-36163 as DateTime),106) END AS FormattedCCJInterestTo"))
@@ -599,50 +554,44 @@ class QueryBuilder
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.CommissionUntilDate,0) = 0 OR ColData.CommissionUntilDate = 0 OR ColData.CommissionUntilDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.CommissionUntilDate-36163 as DateTime),106) END AS FormattedCommissionUntilDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.LastPaymentDate,0) = 0 OR ColData.LastPaymentDate = 0 OR ColData.LastPaymentDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.LastPaymentDate-36163 as DateTime),106) END AS FormattedLastPaymentDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ColData.NextPaymentDate,0) = 0 OR ColData.NextPaymentDate = 0 OR ColData.NextPaymentDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ColData.NextPaymentDate-36163 as DateTime),106) END AS FormattedNextPaymentDate"));
-
     }
 
     public static function ParFicaSelectBuilder(&$query)
     {
-        $query->addselect("ParFica.*")
+        $query->addselect('ParFica.*')
         ->addselect(DB::raw("CASE WHEN ISNULL(ParFica.Date,0) = 0 OR ParFica.Date = 0 OR ParFica.Date > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParFica.Date-36163 as DateTime),106) END AS FormattedDate"))
-        
-        ->addSelect("ficaitem.RecordID")
-        ->addSelect("ficaitem.Description")
-        ->addSelect("ficaitem.Comments as FicaItemComments")
-        ->addSelect("ficaitem.Expiry")
-        ->addselect("EntityFica.EntityID")
-        ->addselect("EntityFica.FicaItemID");
 
+        ->addSelect('ficaitem.RecordID')
+        ->addSelect('ficaitem.Description')
+        ->addSelect('ficaitem.Comments as FicaItemComments')
+        ->addSelect('ficaitem.Expiry')
+        ->addselect('EntityFica.EntityID')
+        ->addselect('EntityFica.FicaItemID');
     }
 
     public static function ParFicaJoinBuilder(&$query)
     {
         $query->leftJoin('FicaItem', 'ParFica.FicaItemID', '=', 'FicaItem.RecordId')
         ->leftJoin('EntityFica', 'EntityFica.FicaItemID', '=', 'FicaItem.RecordId');
-        
     }
 
     public static function ParLangSelectBuilder(&$query)
     {
-        $query->addSelect("ParLang.*")
+        $query->addSelect('ParLang.*')
         ->addselect(DB::raw("CASE WHEN ISNULL(ParLang.GPASignedOn,0) = 0 OR ParLang.GPASignedOn = 0 OR ParLang.GPASignedOn > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParLang.GPASignedOn-36163 as DateTime),106) END AS FormattedGPASignedOn"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ParLang.BirthDate,0) = 0 OR ParLang.BirthDate = 0 OR ParLang.BirthDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParLang.BirthDate-36163 as DateTime),106) END AS FormattedBirthDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ParLang.SpouseBirthDate,0) = 0 OR ParLang.SpouseBirthDate = 0 OR ParLang.SpouseBirthDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParLang.SpouseBirthDate-36163 as DateTime),106) END AS FormattedSpouseBirthDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ParLang.MarriageDate,0) = 0 OR ParLang.MarriageDate = 0 OR ParLang.MarriageDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParLang.MarriageDate-36163 as DateTime),106) END AS FormattedMarriageDate"))
         ->addselect(DB::raw("CASE WHEN ISNULL(ParLang.TrustDate,0) = 0 OR ParLang.TrustDate = 0 OR ParLang.TrustDate > 100000 THEN '' ELSE  CONVERT(VarChar(12),CAST(ParLang.TrustDate-36163 as DateTime),106) END AS FormattedTrustDate"));
-
-
     }
 
     public static function ParRelSelectBuilder(&$query)
     {
-        $query->addselect("ParRel.*")
-        ->addSelect("DocFoxRelationship.DocFoxId")
-        ->addSelect("Relationship.Description as Relationship")
-        ->addSelect("Party.Name as PartyName")
-        ->addSelect("Party.MatterPrefix as PartyMatterPrefix");
-
+        $query->addselect('ParRel.*')
+        ->addSelect('DocFoxRelationship.DocFoxId')
+        ->addSelect('Relationship.Description as Relationship')
+        ->addSelect('Party.Name as PartyName')
+        ->addSelect('Party.MatterPrefix as PartyMatterPrefix');
     }
 
     public static function ParRelJoinBuilder(&$query)
@@ -653,17 +602,15 @@ class QueryBuilder
             $join->on('DocFoxRelationship.ParentPartyID', '=', 'ParRel.PartyId')
             ->on('DocFoxRelationship.RelatedPartyID', '=', 'ParRel.OtherPartyID');
         });
-        
     }
-    
+
     public static function MatGroupSelectBuilder(&$query)
     {
-        $query->addselect("MatGroup.*")
+        $query->addselect('MatGroup.*')
         // ->addselect("Grouping.recordid as GroupingRecordID")
-        ->addselect("Grouping.description as GroupingDescription");
-        
+        ->addselect('Grouping.description as GroupingDescription');
     }
-    
+
     public static function MatGroupJoinBuilder(&$query)
     {
         $query->leftJoin('Grouping', 'MatGroup.GroupID ', '=', 'Grouping.RecordID');
@@ -671,12 +618,11 @@ class QueryBuilder
 
     public static function ConveyDataSelectBuilder(&$query)
     {
-        $query->addselect("ConveyData.*")
+        $query->addselect('ConveyData.*')
         // ->addselect("Grouping.recordid as GroupingRecordID")
-        ->addselect("bondcause.description as bondcausedescription");
-        
+        ->addselect('bondcause.description as bondcausedescription');
     }
-    
+
     public static function ConveyDataJoinBuilder(&$query)
     {
         $query->leftJoin('bondcause', 'ConveyData.bondcauseid ', '=', 'bondcause.RecordID');
@@ -684,11 +630,10 @@ class QueryBuilder
 
     public static function ParFieldSelectBuilder(&$query)
     {
-        $query->addselect("ParField.*")
-        ->addselect("DocScrn.*");    
-        
+        $query->addselect('ParField.*')
+        ->addselect('DocScrn.*');
     }
-    
+
     public static function ParFieldJoinBuilder(&$query)
     {
         $query->join('DocScrn', 'ParField.DocScreenID ', '=', 'DocScrn.RecordID');
@@ -696,11 +641,10 @@ class QueryBuilder
 
     public static function ParRolScSelectBuilder(&$query)
     {
-        $query->addselect("ParRolSc.*")
-        ->addselect("DocScrn.*");    
-        
+        $query->addselect('ParRolSc.*')
+        ->addselect('DocScrn.*');
     }
-    
+
     public static function ParRolScJoinBuilder(&$query)
     {
         $query->join('DocScrn', 'ParRolSc.RoleScreenID ', '=', 'DocScrn.RecordID');
@@ -708,16 +652,12 @@ class QueryBuilder
 
     public static function MatDocScSelectBuilder(&$query)
     {
-        $query->addselect("MatDocSc.*")
-        ->addselect("DocScrn.*");
-        
+        $query->addselect('MatDocSc.*')
+        ->addselect('DocScrn.*');
     }
 
     public static function MatDocScJoinBuilder(&$query)
     {
         $query->join('DocScrn', 'Docscrn.recordid', '=', 'MatDocSc.DocScreenID');
     }
-
-
 }
-                

@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use \Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redirect;
 
 class LowercaseRoutes
 {
@@ -28,7 +28,7 @@ class LowercaseRoutes
         $condition_1 = ! ctype_lower(preg_replace('/[^A-Za-z]/', '', $request->path()));
 
         // assert that path is not root
-        $condition_2 = $request->path() !== "/";
+        $condition_2 = $request->path() !== '/';
 
         // assert that path is not excluded from lowercase routes
         $condition_3 = ! $request->is($this->excluded);
@@ -36,6 +36,7 @@ class LowercaseRoutes
         // rewrite route to lowercase if all conditions are met
         if ($condition_1 && $condition_2 && $condition_3) {
             $new_route = str_replace($request->path(), strtolower($request->path()), $request->fullUrl());
+
             return Redirect::to($new_route, 301);
         }
 

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -12,13 +12,13 @@ return [
     | as required, but they're a perfect start for most applications.
     |
     */
-    
+
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'clients',
         // 'passwords' => 'users',
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -35,7 +35,7 @@ return [
     | Supported: "session", "token"
     |
     */
-    
+
     'guards' => [
         'web' => [
             'driver' => 'session',
@@ -47,14 +47,14 @@ return [
             'provider' => 'developers',
             // 'provider' => 'users',
         ],
-        
+
         'api' => [
             'driver' => 'token',
             'provider' => 'api_access',
             'hash' => false,
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -71,7 +71,7 @@ return [
     | Supported: "database", "eloquent"
     |
     */
-    
+
     'providers' => [
         'clients' => [
             'driver' => 'eloquent',
@@ -81,19 +81,19 @@ return [
             'driver' => 'eloquent',
             'model' => App\Developer::class,
         ],
-        
+
         'api_access' => [
             'driver' => 'eloquent',
             'model' => App\ApiAccess::class,
         ],
-        
+
         // 'users' => [
-            //     'driver' => 'database',
-            //     'table' => 'users',
-            // ],
-        ],
-        
-        /*
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
+    ],
+
+    /*
         |--------------------------------------------------------------------------
         | Resetting Passwords
         |--------------------------------------------------------------------------
@@ -107,17 +107,17 @@ return [
         | they have less time to be guessed. You may change this as needed.
         |
         */
-        
-        'passwords' => [
-            'clients' => [
-                'provider' => 'tr',
-                'table' => 'password_resets',
-                'expire' => 60,
-                'throttle' => 60,
-            ],
+
+    'passwords' => [
+        'clients' => [
+            'provider' => 'tr',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
         ],
-        
-        /*
+    ],
+
+    /*
         |--------------------------------------------------------------------------
         | Password Confirmation Timeout
         |--------------------------------------------------------------------------
@@ -127,8 +127,7 @@ return [
         | confirmation screen. By default, the timeout lasts for three hours.
         |
         */
-        
-        'password_timeout' => 10800,
-        
-    ];
-    
+
+    'password_timeout' => 10800,
+
+];

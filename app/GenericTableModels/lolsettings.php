@@ -4,15 +4,18 @@ namespace App\GenericTableModels;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class lolsettings extends Model
 {
-
     protected $connection = 'sqlsrv';
+
     protected $table = 'LolSettings';
+
     public $timestamps = false;
+
     protected $primaryKey = 'recordid';
+
     public $incrementing = true;
+
     protected $guarded = ['recordid'];
     // protected $fillable = [
     //     'website',
@@ -27,7 +30,4 @@ class lolsettings extends Model
     //     'incomingport',
     //     'incomingencryption',
     // ];
-
-
 }
-        

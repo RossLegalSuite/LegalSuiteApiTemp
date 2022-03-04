@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\ViewControllers;
 
-use App\Http\Controllers\Controller;
 use App\Custom\ControllerHelper;
 use App\Custom\QueryBuilder;
 use App\Custom\ReportBuilder;
+use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Http\Request;
 
@@ -13,11 +13,10 @@ class deprecatedPracticeManagementController extends Controller
 {
     public function getMattersNoActivity(Request $request)
     {
-
-        $NoFileNotes = strpos(' ' . $request->filter['flags'], 'File Notes') > 0 ? 1 : 0;
-        $NoFeeNotes = strpos(' ' . $request->filter['flags'], 'Fee Notes') > 0 ? 1 : 0;
-        $NoReminders = strpos(' ' . $request->filter['flags'], 'Reminders') > 0 ? 1 : 0;
-        $NoDocuments = strpos(' ' . $request->filter['flags'], 'Documents') > 0 ? 1 : 0;
+        $NoFileNotes = strpos(' '.$request->filter['flags'], 'File Notes') > 0 ? 1 : 0;
+        $NoFeeNotes = strpos(' '.$request->filter['flags'], 'Fee Notes') > 0 ? 1 : 0;
+        $NoReminders = strpos(' '.$request->filter['flags'], 'Reminders') > 0 ? 1 : 0;
+        $NoDocuments = strpos(' '.$request->filter['flags'], 'Documents') > 0 ? 1 : 0;
 
         // if ($request->method === "preview" || $request->method === "chart") {
 
@@ -122,19 +121,19 @@ class deprecatedPracticeManagementController extends Controller
         ReportBuilder::DefaultColumnReportMatterBuilder($query);
 
         if ($NoDocuments) {
-            $query->addselect("Documents");
+            $query->addselect('Documents');
         }
 
         if ($NoFileNotes) {
-            $query->addselect("FileNotes");
+            $query->addselect('FileNotes');
         }
 
         if ($NoFeeNotes) {
-            $query->addselect("FeeNotes");
+            $query->addselect('FeeNotes');
         }
 
         if ($NoReminders) {
-            $query->addselect("Reminders");
+            $query->addselect('Reminders');
         }
 
         // }
@@ -143,33 +142,26 @@ class deprecatedPracticeManagementController extends Controller
         ReportBuilder::DefaultWhereReportMatterBuilder($query, $request);
 
         // These are for the pop-up modals when clicking on the Pie Chart
-        if ($request->customMethod === "File Notes") {
-
+        if ($request->customMethod === 'File Notes') {
             $query->leftjoin('FileNote', 'FileNote.MatterID', '=', 'Matter.RecordID')->whereNull('FileNote.RecordID');
-        } else if ($request->customMethod === "Fee Notes") {
-
+        } elseif ($request->customMethod === 'Fee Notes') {
             $query->leftjoin('FeeNote', 'FeeNote.MatterID', '=', 'Matter.RecordID')->whereNull('FeeNote.RecordID');
-        } else if ($request->customMethod === "Reminders") {
-
+        } elseif ($request->customMethod === 'Reminders') {
             $query->leftjoin('ToDoNote', 'ToDoNote.MatterID', '=', 'Matter.RecordID')->whereNull('ToDoNote.RecordID');
-        } else if ($request->customMethod === "Documents") {
-
+        } elseif ($request->customMethod === 'Documents') {
             $query->leftjoin('DocLog', 'DocLog.MatterID', '=', 'Matter.RecordID')->whereNull('DocLog.RecordID');
         } else {
-
-            if ($request->method !== "totalCount") {
-
-                if ($request->filter["periodType"] === "Day" || $request->filter["periodType"] === "Week" || $request->filter["periodType"] === "Month" || $request->filter["periodType"] === "Year") {
+            if ($request->method !== 'totalCount') {
+                if ($request->filter['periodType'] === 'Day' || $request->filter['periodType'] === 'Week' || $request->filter['periodType'] === 'Month' || $request->filter['periodType'] === 'Year') {
 
                     //https://www.w3schools.com/php/func_date_strtotime.asp
 
-                    $calculatedPeriodDate = date("Y-m-d", strtotime(-$request->filter["periodAmount"] . $request->filter["periodType"]));
+                    $calculatedPeriodDate = date('Y-m-d', strtotime(-$request->filter['periodAmount'].$request->filter['periodType']));
                 } else {
                     $calculatedPeriodDate = null;
                 }
 
                 if ($NoFileNotes) {
-
                     $joinNoFileNotesSubQuery = DB::connection('sqlsrv')
                         ->table('FileNote')
                         ->selectraw('[FileNote].[MatterID], Count(recordid) as [FileNotes]');
@@ -230,9 +222,7 @@ class deprecatedPracticeManagementController extends Controller
                     });
                 }
                 $query->where(function ($query) use ($NoFileNotes, $NoFeeNotes, $NoReminders, $NoDocuments) {
-
                     if ($NoFileNotes) {
-
                         $query->orWhereRaw('Isnull(FileNotes, 0) = 0');
                     }
                     if ($NoFeeNotes) {
@@ -246,16 +236,13 @@ class deprecatedPracticeManagementController extends Controller
                     }
                 });
 
-                if (!$NoDocuments && !$NoFileNotes && !$NoFeeNotes && !$NoReminders) {
-
+                if (! $NoDocuments && ! $NoFileNotes && ! $NoFeeNotes && ! $NoReminders) {
                     $query->whereRaw('1=0');
                 }
             }
         }
         if ($request->input('method')) {
-
             return ControllerHelper::MethodHelper($query, $request);
-
         }
 
         return ControllerHelper::DataFormatHelper($query, $request);
@@ -263,7 +250,6 @@ class deprecatedPracticeManagementController extends Controller
 
     public function getMattersPrescribing(Request $request)
     {
-
         $query = DB::connection('sqlsrv')
             ->table('Matter');
 
@@ -273,33 +259,27 @@ class deprecatedPracticeManagementController extends Controller
         ReportBuilder::DefaultJoinReportMatterBuilder($query);
         ReportBuilder::DefaultWhereReportMatterBuilder($query, $request);
 
-        if (isset($request->filter["periodType"])) {
-
-            if ($request->filter["periodType"] === "day" || "week" || "month" || "year") {
+        if (isset($request->filter['periodType'])) {
+            if ($request->filter['periodType'] === 'day' || 'week' || 'month' || 'year') {
 
                 //https://www.w3schools.com/php/func_date_strtotime.asp
 
-                $calculatedPeriodDate = date("Y-m-d", strtotime($request->filter["periodAmount"] . $request->filter["periodType"]));
+                $calculatedPeriodDate = date('Y-m-d', strtotime($request->filter['periodAmount'].$request->filter['periodType']));
 
-                if ($request->filter["periodAmount"] >= 0) {
+                if ($request->filter['periodAmount'] >= 0) {
+                    $query->whereRaw("Matter.PrescriptionDate >= DateDiff(day,'28 Dec 1800','".date('Y-m-d')."')");
 
-                    $query->whereRaw("Matter.PrescriptionDate >= DateDiff(day,'28 Dec 1800','" . date("Y-m-d") . "')");
+                    $query->whereRaw("Matter.PrescriptionDate <= DateDiff(day,'28 Dec 1800','".$calculatedPeriodDate."')");
+                } elseif ($request->filter['periodAmount'] < 0) {
+                    $query->whereRaw("Matter.PrescriptionDate >= DateDiff(day,'28 Dec 1800','".$calculatedPeriodDate."')");
 
-                    $query->whereRaw("Matter.PrescriptionDate <= DateDiff(day,'28 Dec 1800','" . $calculatedPeriodDate . "')");
-                } else if ($request->filter["periodAmount"] < 0) {
-
-                    $query->whereRaw("Matter.PrescriptionDate >= DateDiff(day,'28 Dec 1800','" . $calculatedPeriodDate . "')");
-
-                    $query->whereRaw("Matter.PrescriptionDate <= DateDiff(day,'28 Dec 1800','" . date("Y-m-d") . "')");
+                    $query->whereRaw("Matter.PrescriptionDate <= DateDiff(day,'28 Dec 1800','".date('Y-m-d')."')");
                 }
             }
-
         }
 
         if ($request->input('method')) {
-
             return ControllerHelper::MethodHelper($query, $request);
-
         }
 
         return ControllerHelper::DataFormatHelper($query, $request);

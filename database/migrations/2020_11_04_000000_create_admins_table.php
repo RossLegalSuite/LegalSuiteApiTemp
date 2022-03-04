@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 class CreateAdminsTable extends Migration
 {
     /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('admins', function (Blueprint $table) {
@@ -21,18 +21,16 @@ class CreateAdminsTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            
-            
-            
+
             $table->timestamps();
         });
     }
-    
+
     /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         Schema::dropIfExists('admins');

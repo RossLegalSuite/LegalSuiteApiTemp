@@ -59,7 +59,6 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'private',
         ],
-        
 
         's3' => [
             'driver' => 's3',
@@ -78,8 +77,6 @@ return [
             'bucket' => env('AF_SOUTH_1_BUCKET'),
             'url' => env('AF_SOUTH_1_URL'),
         ],
-
-
 
     ],
 

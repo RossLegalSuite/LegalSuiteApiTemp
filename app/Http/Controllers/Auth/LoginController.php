@@ -18,23 +18,22 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
-    
+
     use AuthenticatesUsers;
-    
+
     /**
-    * Where to redirect users after login.
-    *
-    * @var string
-    */
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
     protected $redirectTo = '/home';
-    
+
     /**
-    * Create a new controller instance.
-    *
-    * @return void
-    */
+     * Create a new controller instance.
+     *
+     * @return void
+     */
     public function __construct()
-    
     {
         $this->middleware('guest')->except('logout');
         // $this->middleware('guest:developer')->except('logout');
@@ -44,7 +43,7 @@ class LoginController extends Controller
     // {
         //     return Auth::guard('guard-name');
         // }
-        
+
         // public function authenticate(Request $request)
         // {
             //     $credentials = $request->only('email', 'password');
@@ -57,5 +56,4 @@ class LoginController extends Controller
                     //         //     return redirect()->intended('dashboard');
                     //         // }
                     //     }
-                }
-                
+}

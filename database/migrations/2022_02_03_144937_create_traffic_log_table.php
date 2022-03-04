@@ -26,7 +26,6 @@ class CreateTrafficLogTable extends Migration
             $table->Text('parameters')->nullable();
 
             $table->timestamps();
-
         });
     }
 

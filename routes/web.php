@@ -15,6 +15,7 @@ Route::get('/', function () {
     if (Auth::user()) {
         return redirect('/home');
     }
+
     return view('welcome');
 });
 Route::get('/docs', 'DocsController@index')->name('docs');
@@ -31,4 +32,3 @@ Route::post('/setapiaccess', 'HomeController@setApiAccess');
 
 Route::post('/test-database-connection', 'RegisterController@testDatabaseConnection');
 Route::post('/updateclient', 'RegisterController@updateClient')->name('updateClient');
-

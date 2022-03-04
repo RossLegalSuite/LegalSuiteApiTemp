@@ -2,38 +2,30 @@
 
 namespace App\Http\Controllers\StoredProcedureControllers;
 
-use App\Http\Controllers\Controller;
 use App\Custom\ControllerHelper;
+use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Http\Request;
 
 class SP_ResortBondDebitSorterController extends Controller
 {
+    public function parameters(Request $request)
+    {
+        return ControllerHelper::tryCatch($request, function ($request) {
+            $returnData['data']['store producure name'] = strtolower('SP_ResortBondDebitSorter');
+            $returnData['data']['number of parameters'] = '1';
+            $returnData['data']['parameters'] = json_decode('[{"name":"@MatterID","type":"int"}]');
 
+            return $returnData;
+        });
+    }
 
-	public function parameters(Request $request)
-	{
-		return ControllerHelper::tryCatch($request, function ($request) {
-		
-			$returnData['data']['store producure name'] = strtolower('SP_ResortBondDebitSorter');
-			$returnData['data']['number of parameters'] = '1';
-			$returnData['data']['parameters'] = json_decode('[{"name":"@MatterID","type":"int"}]');
-			return $returnData;
-		
-		});
+    public function execute(Request $request)
+    {
+        return ControllerHelper::tryCatch($request, function ($request) {
+            $responseObject = DB::connection('sqlsrv')->statement('EXEC SP_ResortBondDebitSorter	@matterid='.$request->matterid);
 
-	}
-
-	public function execute(Request $request)
-	{
-		return ControllerHelper::tryCatch($request, function ($request) {
-		
-			$responseObject = DB::connection('sqlsrv')->statement('EXEC SP_ResortBondDebitSorter	@matterid='.$request->matterid);
-
-			return ControllerHelper::StoredProcedureFormatHelper($responseObject, $request);		
-		});
-
-	}
-
-} 
-
+            return ControllerHelper::StoredProcedureFormatHelper($responseObject, $request);
+        });
+    }
+}

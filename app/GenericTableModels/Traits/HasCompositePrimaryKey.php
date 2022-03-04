@@ -1,6 +1,6 @@
 <?php
 
-namespace App\GenericTableModels\Traits; 
+namespace App\GenericTableModels\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 
@@ -29,10 +29,11 @@ trait HasCompositePrimaryKey
     {
         foreach ($this->getKeyName() as $key) {
             // UPDATE: Added isset() per devflow's comment.
-            if (isset($this->$key))
+            if (isset($this->$key)) {
                 $query->where($key, '=', $this->$key);
-            else
-                throw new \Exception(__METHOD__ . 'Missing part of the primary key: ' . $key);
+            } else {
+                throw new \Exception(__METHOD__.'Missing part of the primary key: '.$key);
+            }
         }
 
         return $query;
@@ -53,6 +54,7 @@ trait HasCompositePrimaryKey
         foreach ($me->getKeyName() as $key) {
             $query->where($key, '=', $ids[$key]);
         }
+
         return $query->first($columns);
     }
 }

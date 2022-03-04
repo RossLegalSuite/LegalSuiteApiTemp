@@ -31,7 +31,6 @@ class CreateApiTrafficLogTable extends Migration
             $table->Text('header')->nullable();
 
             $table->timestamps();
-
         });
     }
 

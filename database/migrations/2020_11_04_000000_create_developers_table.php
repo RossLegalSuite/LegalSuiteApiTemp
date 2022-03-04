@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 class CreateDevelopersTable extends Migration
 {
     /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('developers', function (Blueprint $table) {
@@ -22,17 +22,16 @@ class CreateDevelopersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('isNotActive')->default(0);
-            
-            
+
             $table->timestamps();
         });
     }
-    
+
     /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         Schema::dropIfExists('developers');

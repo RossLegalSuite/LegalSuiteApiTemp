@@ -2,151 +2,147 @@
 
 namespace App\Custom;
 
-
-use App\Custom\PartyRulesController;
-use App\Custom\MatterRulesController;
 use App\Custom\ColDebitRulesController;
 use App\Custom\DocLogRulesController;
 use App\Custom\FeeNoteRulesController;
 use App\Custom\LolComponentRulesController;
 use App\Custom\LolSystemTemplateRulesController;
+use App\Custom\MatterRulesController;
+use App\Custom\PartyRulesController;
 
 class BusinessRulesController
 {
-
-    public function StoreFileNote($request) {
-
+    public function StoreFileNote($request)
+    {
         $rulesController = new FileNoteRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateFileNote($request) {
-
+    public function UpdateFileNote($request)
+    {
         $rulesController = new FileNoteRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreTodoNote($request) {
-
+    public function StoreTodoNote($request)
+    {
         $rulesController = new ToDoNoteRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateToDoNote($request) {
-
+    public function UpdateToDoNote($request)
+    {
         $rulesController = new ToDoNoteRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-
-
-    public function StoreFeeNote($request) {
-
+    public function StoreFeeNote($request)
+    {
         $rulesController = new FeeNoteRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateFeeNote($request) {
-
+    public function UpdateFeeNote($request)
+    {
         $rulesController = new FeeNoteRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreDocLog($request) {
-
+    public function StoreDocLog($request)
+    {
         $rulesController = new DocLogRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateDocLog($request) {
-
+    public function UpdateDocLog($request)
+    {
         $rulesController = new DocLogRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreLolComponent($request) {
-
+    public function StoreLolComponent($request)
+    {
         $rulesController = new LolComponentRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateLolComponent($request) {
-
+    public function UpdateLolComponent($request)
+    {
         $rulesController = new LolComponentRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreLolSystemTemplate($request) {
-
+    public function StoreLolSystemTemplate($request)
+    {
         $rulesController = new LolSystemTemplateRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateLolSystemTemplate($request) {
-
+    public function UpdateLolSystemTemplate($request)
+    {
         $rulesController = new LolSystemTemplateRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreColDebit($request) {
-
+    public function StoreColDebit($request)
+    {
         $rulesController = new ColDebitRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateColDebit($request) {
-
+    public function UpdateColDebit($request)
+    {
         $rulesController = new ColDebitRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreMatter($request) {
-
+    public function StoreMatter($request)
+    {
         $rulesController = new MatterRulesController;
-        return $rulesController->storeRecord($request);
 
+        return $rulesController->storeRecord($request);
     }
 
-    public function UpdateMatter($request) {
-
+    public function UpdateMatter($request)
+    {
         $rulesController = new MatterRulesController;
+
         return $rulesController->updateRecord($request);
-    
     }
 
-    public function StoreParty($request) {
-
+    public function StoreParty($request)
+    {
         $rulesController = new PartyRulesController;
+
         return $rulesController->storeRecord($request);
-
     }
 
-    public function UpdateParty($request) {
-
+    public function UpdateParty($request)
+    {
         $rulesController = new PartyRulesController;
-        return $rulesController->updateRecord($request);
 
+        return $rulesController->updateRecord($request);
     }
 
     // public static function DefaultFileNoteStoreBusinessRules($createData)
     // {
     //     $recordData = FileNote::create($createData);
     //     return $recordData;
-    
+
     // }
 
     // public static function DefaultFileNoteUpdateBusinessRules($updateData)
@@ -185,8 +181,4 @@ class BusinessRulesController
     //     // throw errors ( cannot do );
     //     return $recordData;
     // }
-    
-
-
 }
-                
