@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\StoredProcedureControllers;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/storedprocedure', function (Request $request) {
     $routes = [];

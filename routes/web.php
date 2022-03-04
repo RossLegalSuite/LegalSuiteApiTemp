@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\DocsController;

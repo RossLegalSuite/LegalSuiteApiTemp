@@ -26,21 +26,21 @@ class CompanyDatabase
         //}
 
         config(['database.connections.sqlsrv' => [
-                'driver' => 'sqlsrv',
-                'host' => $company[0]['dbHost'],
-                'database' => $company[0]['dbDatabase'],
-                'port' => $company[0]['dbPort'],
-                'username' => $company[0]['dbUser'],
-                'password' => $company[0]['dbPassword'],
-                'charset' => 'utf8',
-                'prefix' => '',
-                'prefix_indexes' => true,
-                'options' => [
-                    \PDO::SQLSRV_ATTR_QUERY_TIMEOUT => 0,
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                    \PDO::SQLSRV_ATTR_CLIENT_BUFFER_MAX_KB_SIZE => 102400,
-                ],
+            'driver' => 'sqlsrv',
+            'host' => $company[0]['dbHost'],
+            'database' => $company[0]['dbDatabase'],
+            'port' => $company[0]['dbPort'],
+            'username' => $company[0]['dbUser'],
+            'password' => $company[0]['dbPassword'],
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'options' => [
+                \PDO::SQLSRV_ATTR_QUERY_TIMEOUT => 0,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::SQLSRV_ATTR_CLIENT_BUFFER_MAX_KB_SIZE => 102400,
             ],
+        ],
         ]);
 
         //\PDO::ATTR_PERSISTENT => true,
@@ -52,16 +52,16 @@ class CompanyDatabase
         $company = DB::table('companies')->find($companyId);
 
         config(['database.connections.company' => [
-                'driver' => 'sqlsrv',
-                'host' => $company->dbHost,
-                'database' => $company->dbDatabase,
-                'port' => $company->dbPort,
-                'username' => $company->dbUser,
-                'password' => $company->dbPassword,
-                'charset' => 'utf8',
-                'prefix' => '',
-                'prefix_indexes' => true,
-            ],
+            'driver' => 'sqlsrv',
+            'host' => $company->dbHost,
+            'database' => $company->dbDatabase,
+            'port' => $company->dbPort,
+            'username' => $company->dbUser,
+            'password' => $company->dbPassword,
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
         ]);
 
         //\PDO::ATTR_TIMEOUT => 5,
