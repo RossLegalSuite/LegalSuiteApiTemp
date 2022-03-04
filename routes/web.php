@@ -1,4 +1,11 @@
 <?php
+use App\Http\Controllers\Auth;
+use App\Http\Controllers\DeveloperController;
+use App\Http\Controllers\DocsController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,17 +25,17 @@ Route::get('/', function () {
 
     return view('welcome');
 });
-Route::get('/docs', 'DocsController@index')->name('docs');
-Route::get('/docs/database', 'DocsController@databaseDocument')->name('databaseDocument');
+Route::get('/docs', [DocsController::class, 'index'])->name('docs');
+Route::get('/docs/database', [DocsController::class, 'databaseDocument'])->name('databaseDocument');
 
 Auth::routes();
-Route::post('/login', 'LoginController@authenticate');
-Route::post('/registerclient', 'Auth\RegisterController@registerClient')->name('registerClient');
-Route::get('/registerdeveloper', 'Auth\RegisterController@registerDeveloper')->name('registerDeveloper');
-Route::post('/createdeveloper', 'Auth\RegisterController@createDeveloper')->name('createDeveloper');
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/developerhome', 'DeveloperController@index')->name('developerHome');
-Route::post('/setapiaccess', 'HomeController@setApiAccess');
+Route::post('/login', [LoginController::class, 'authenticate']);
+Route::post('/registerclient', [Auth\RegisterController::class, 'registerClient'])->name('registerClient');
+Route::get('/registerdeveloper', [Auth\RegisterController::class, 'registerDeveloper'])->name('registerDeveloper');
+Route::post('/createdeveloper', [Auth\RegisterController::class, 'createDeveloper'])->name('createDeveloper');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/developerhome', [DeveloperController::class, 'index'])->name('developerHome');
+Route::post('/setapiaccess', [HomeController::class, 'setApiAccess']);
 
-Route::post('/test-database-connection', 'RegisterController@testDatabaseConnection');
-Route::post('/updateclient', 'RegisterController@updateClient')->name('updateClient');
+Route::post('/test-database-connection', [RegisterController::class, 'testDatabaseConnection']);
+Route::post('/updateclient', [RegisterController::class, 'updateClient'])->name('updateClient');
