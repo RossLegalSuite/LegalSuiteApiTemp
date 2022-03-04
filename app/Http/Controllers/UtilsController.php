@@ -344,7 +344,7 @@ class UtilsController extends Controller
         $statement = 'INSERT INTO lolTagged (tableName, employeeId, taggedId) ';
         $statement .= "SELECT '{$request['tablename']}', '{$request['employeeid']}', {$request['tablename']}.RecordID FROM {$request['tablename']} ";
 
-        if (method_exists('App\Custom\SelectAndJoinBuilder', strtolower($request['tablename']).'JoinBuilder') & ! $request->removejoinbuilder) {
+        if (method_exists(\App\Custom\SelectAndJoinBuilder::class, strtolower($request['tablename']).'JoinBuilder') & ! $request->removejoinbuilder) {
 
             // Use this hack to get the table joins in string format to add to the statement
             $query = DB::connection('sqlsrv')->table('dummy');

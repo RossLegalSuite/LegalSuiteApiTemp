@@ -107,7 +107,7 @@ class AdminController extends Controller
 
         ParameterBuilder::ParameterBuilder($query, $request);
 
-        if (method_exists('App\Custom\QueryBuilder', 'DefaultCompanyBuilder')) {
+        if (method_exists(\App\Custom\QueryBuilder::class, 'DefaultCompanyBuilder')) {
             ParameterBuilder::DefaultCompanyBuilder($query);
         }
 
@@ -125,7 +125,7 @@ class AdminController extends Controller
 
         ParameterBuilder::ParameterBuilder($query, $request);
 
-        if (method_exists('App\Custom\QueryBuilder', 'DefaultCompanyBuilder')) {
+        if (method_exists(\App\Custom\QueryBuilder::class, 'DefaultCompanyBuilder')) {
             ParameterBuilder::DefaultCompanyBuilder($query);
         }
 

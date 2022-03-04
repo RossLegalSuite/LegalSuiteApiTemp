@@ -59,7 +59,7 @@ $controller->store($request, 'library');
 
         $requestData = $request->all();
 
-        if (method_exists('App\Custom\BusinessRulesController', 'Store'.strtolower($tableName))) {
+        if (method_exists(\App\Custom\BusinessRulesController::class, 'Store'.strtolower($tableName))) {
             $businessRulesController = new BusinessRulesController;
             $methodName = 'Store'.strtolower($tableName);
             $recordData = $businessRulesController->$methodName($requestData);
@@ -89,7 +89,7 @@ $controller->store($request, 'library');
 
         $requestData = $request->all();
 
-        if (method_exists('App\Custom\BusinessRulesController', 'Update'.strtolower($tableName))) {
+        if (method_exists(\App\Custom\BusinessRulesController::class, 'Update'.strtolower($tableName))) {
             $businessRulesController = new BusinessRulesController;
             $methodName = 'Update'.strtolower($tableName);
             $recordData = $businessRulesController->$methodName($requestData);
@@ -143,7 +143,7 @@ $controller->store($request, 'library');
 
         $requestData = $request->all();
 
-        if (method_exists('App\Custom\BusinessRulesController', 'Delete'.strtolower($tableName))) {
+        if (method_exists(\App\Custom\BusinessRulesController::class, 'Delete'.strtolower($tableName))) {
             $businessRulesController = new BusinessRulesController;
             $methodName = 'Delete'.strtolower($tableName);
             $recordData = $businessRulesController->$methodName($requestData);
@@ -589,7 +589,7 @@ $controller->store($request, 'library');
 
     private function setSelectAndJoins(Request $request, $tableName, &$query)
     {
-        if (method_exists('App\Custom\SelectAndJoinBuilder', strtolower($tableName).'JoinBuilder') && ! $request->removejoinbuilder) {
+        if (method_exists(\App\Custom\SelectAndJoinBuilder::class, strtolower($tableName).'JoinBuilder') && ! $request->removejoinbuilder) {
             SelectAndJoinBuilder::{strtolower($tableName).'JoinBuilder'}($query, $request);
         }
 
@@ -602,7 +602,7 @@ $controller->store($request, 'library');
             });
         }
 
-        if (method_exists('App\Custom\SelectAndJoinBuilder', strtolower($tableName).'SelectBuilder') && ! $request->select && ! $request->selectraw && ! $request->columnraw && ! $request->column) {
+        if (method_exists(\App\Custom\SelectAndJoinBuilder::class, strtolower($tableName).'SelectBuilder') && ! $request->select && ! $request->selectraw && ! $request->columnraw && ! $request->column) {
             SelectAndJoinBuilder::{strtolower($tableName).'SelectBuilder'}($query, $request);
         } elseif (! $request->select && ! $request->selectraw && ! $request->columnraw && ! $request->column) {
             $query->addselect($tableName.'.*');
