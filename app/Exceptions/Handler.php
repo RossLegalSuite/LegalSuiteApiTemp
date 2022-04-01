@@ -2,17 +2,15 @@
 
 namespace App\Exceptions;
 
-use Exception;
-use App\ErrorLog;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array
+     * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
         //
@@ -21,78 +19,25 @@ class Handler extends ExceptionHandler
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $dontFlash = [
+        'current_password',
         'password',
         'password_confirmation',
     ];
 
     /**
-     * Report or log an exception.
+     * Register the exception handling callbacks for the application.
      *
-     * @param  \Exception  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function register()
     {
-        parent::report($exception);
+        $this->reportable(function (Throwable $e) {
+            //
+        });
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
-
-    private function customErrorLogging($request, $exception)
-    {
-
-        try
-        {
-            $errorLog = new ErrorLog;
-
-            $errorLog->ip = strval($request->ip());
-            $errorLog->application = "API";
-            $errorLog->url = strval($request->fullUrl());
-            $errorLog->method = strval($request->method());
-            $errorLog->parameters = strval(json_encode($request->all()));
-            $errorLog->clientId = isset($request->user()['clientId']) ? strval($request->user()['clientId']) : 0;
-            $errorLog->developerId = isset($request->user()['developerId']) ? strval($request->user()['developerId']) : 0;
-            $errorLog->message = strval($exception->getMessage());
-            $errorLog->file = strval($exception->getFile());
-            $errorLog->line = strval($exception->getLine());
-
-            $errorLog->save();
-
-        } catch(\Exception $exception)  {
-            
-
-            $errorLog = new ErrorLog;
-
-            $errorLog->ip = "Server Error";
-            $errorLog->application = "API";
-            $errorLog->message = strval($exception->getMessage());
-            $errorLog->file = strval($exception->getFile());
-            $errorLog->line = strval($exception->getLine());
-
-            $errorLog->save();
-
-        }
-
-    }
-
-    public function render($request, Exception $exception)
-    {
     
-        $this->customErrorLogging($request, $exception);
-    
-        $returnData = new \stdClass();
-        $returnData->data = [];
-        $returnData->errors = $exception->getMessage();
-        return response(json_encode($returnData));
-
-    }
 }
